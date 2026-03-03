@@ -1,0 +1,412 @@
+---
+title: 'Routine Types'
+description: 'TypeScript interfaces for workout routines and categories'
+---
+
+## Overview
+
+The routine types define the structure for workout routines, including workout plans, summaries, and category data. These types provide comprehensive type safety for managing structured workout programs.
+
+## IRoutine
+
+Represents a complete workout routine with all associated data.
+
+```typescript types.d.ts
+interface IRoutine {
+  category: string[];
+  routine: {
+    routine_title: string;
+    routine_description: string;
+    routine_imageUrl: string;
+    workout_plan: { heading: string; day_plan: string }[];
+    workout_summary: {
+      MainGoal: string;
+      WorkoutType: string;
+      TrainingLevel: string;
+      ProgramDuration: string;
+      DaysPerWeek: number;
+      TimePerWorkout: string;
+      EquipmentRequired: string;
+      TargetGender: string;
+    };
+  };
+  id_: number;
+  id: number;
+}
+```
+
+### Properties
+
+<ResponseField name="category" type="string[]" required>
+  Array of category tags for the routine (e.g., ["strength", "beginner", "full-body"])
+</ResponseField>
+
+<ResponseField name="routine" type="object" required>
+  Main routine object containing all workout details
+  
+  <Expandable title="routine properties">
+    <ResponseField name="routine_title" type="string" required>
+      Title of the workout routine
+    </ResponseField>
+
+    <ResponseField name="routine_description" type="string" required>
+      Detailed description of the routine, goals, and approach
+    </ResponseField>
+
+    <ResponseField name="routine_imageUrl" type="string" required>
+      Featured image URL for the routine
+    </ResponseField>
+
+    <ResponseField name="workout_plan" type="object[]" required>
+      Array of daily workout plans
+      
+      <Expandable title="workout_plan item properties">
+        <ResponseField name="heading" type="string" required>
+          Day or phase heading (e.g., "Day 1: Chest & Triceps")
+        </ResponseField>
+
+        <ResponseField name="day_plan" type="string" required>
+          Detailed plan for the day including exercises, sets, and reps
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="workout_summary" type="object" required>
+      Summary of routine characteristics and requirements
+      
+      <Expandable title="workout_summary properties">
+        <ResponseField name="MainGoal" type="string" required>
+          Primary goal of the routine (e.g., "Build Muscle", "Lose Fat")
+        </ResponseField>
+
+        <ResponseField name="WorkoutType" type="string" required>
+          Type of workout (e.g., "Split", "Full Body")
+        </ResponseField>
+
+        <ResponseField name="TrainingLevel" type="string" required>
+          Required experience level (e.g., "Beginner", "Intermediate", "Advanced")
+        </ResponseField>
+
+        <ResponseField name="ProgramDuration" type="string" required>
+          Total duration of the program (e.g., "8 weeks", "12 weeks")
+        </ResponseField>
+
+        <ResponseField name="DaysPerWeek" type="number" required>
+          Number of training days per week
+        </ResponseField>
+
+        <ResponseField name="TimePerWorkout" type="string" required>
+          Average time per workout session (e.g., "60 minutes")
+        </ResponseField>
+
+        <ResponseField name="EquipmentRequired" type="string" required>
+          Equipment needed for the routine (e.g., "Barbell, Dumbbells, Bench")
+        </ResponseField>
+
+        <ResponseField name="TargetGender" type="string" required>
+          Target gender for the routine (e.g., "Male", "Female", "Unisex")
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="id_" type="number" required>
+  Alternative numeric identifier for the routine
+</ResponseField>
+
+<ResponseField name="id" type="number" required>
+  Primary numeric identifier for the routine
+</ResponseField>
+
+## IRoutinesResponse
+
+Paginated response containing multiple routines.
+
+```typescript types.d.ts
+interface IRoutinesResponse {
+  totalPages: number;
+  totalRoutines: number;
+  data: IRoutine[];
+}
+```
+
+### Properties
+
+<ResponseField name="totalPages" type="number" required>
+  Total number of pages available for pagination
+</ResponseField>
+
+<ResponseField name="totalRoutines" type="number" required>
+  Total count of routines matching the query
+</ResponseField>
+
+<ResponseField name="data" type="IRoutine[]" required>
+  Array of routine objects for the current page
+</ResponseField>
+
+## IRoutineCategory
+
+Represents a routine category with visual representation.
+
+```typescript types.d.ts
+interface IRoutineCategory {
+  title: string;
+  imageUrl: string;
+}
+```
+
+### Properties
+
+<ResponseField name="title" type="string" required>
+  Category title (e.g., "Strength Training", "Weight Loss")
+</ResponseField>
+
+<ResponseField name="imageUrl" type="string" required>
+  Image URL representing the category
+</ResponseField>
+
+## IRoutineCategoryResponse
+
+Response containing routine categories and count.
+
+```typescript types.d.ts
+interface IRoutineCategoryResponse {
+  data: {
+    category: IRoutineCategory[];
+  };
+  totalRoutinesFilter: number;
+}
+```
+
+### Properties
+
+<ResponseField name="data" type="object" required>
+  Container for category data
+  
+  <Expandable title="data properties">
+    <ResponseField name="category" type="IRoutineCategory[]" required>
+      Array of available routine categories
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="totalRoutinesFilter" type="number" required>
+  Total number of routines available across all categories
+</ResponseField>
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Fetching Routines">
+    ```typescript
+    import { IRoutinesResponse, IRoutine } from './types';
+
+    async function getRoutines(
+      page: number = 1,
+      category?: string
+    ): Promise<IRoutinesResponse> {
+      const params = new URLSearchParams({ page: page.toString() });
+      if (category) params.append('category', category);
+      
+      const response = await fetch(
+        `https://api.bodyworks.io/routines?${params}`
+      );
+      return response.json();
+    }
+
+    // Type-safe usage
+    const routines = await getRoutines(1, 'strength');
+    console.log(`Total: ${routines.totalRoutines}`);
+    console.log(`Pages: ${routines.totalPages}`);
+    
+    routines.data.forEach((routine: IRoutine) => {
+      console.log(routine.routine.routine_title);
+      console.log(`Days/Week: ${routine.routine.workout_summary.DaysPerWeek}`);
+    });
+    ```
+  </Tab>
+
+  <Tab title="Routine Categories">
+    ```typescript
+    import { IRoutineCategoryResponse, IRoutineCategory } from './types';
+
+    async function getCategories(): Promise<IRoutineCategory[]> {
+      const response = await fetch(
+        'https://api.bodyworks.io/routines/categories'
+      );
+      const result: IRoutineCategoryResponse = await response.json();
+      return result.data.category;
+    }
+
+    // Display categories
+    const categories = await getCategories();
+    categories.forEach((cat) => {
+      console.log(`${cat.title}: ${cat.imageUrl}`);
+    });
+    ```
+  </Tab>
+
+  <Tab title="Workout Plan Display">
+    ```typescript
+    import { IRoutine } from './types';
+
+    function displayWorkoutPlan(routine: IRoutine): void {
+      console.log(`\n${routine.routine.routine_title}`);
+      console.log('='.repeat(50));
+      console.log(routine.routine.routine_description);
+      console.log('\nWorkout Plan:');
+      
+      routine.routine.workout_plan.forEach((day, index) => {
+        console.log(`\n${day.heading}`);
+        console.log(day.day_plan);
+      });
+      
+      console.log('\nSummary:');
+      const summary = routine.routine.workout_summary;
+      console.log(`Goal: ${summary.MainGoal}`);
+      console.log(`Level: ${summary.TrainingLevel}`);
+      console.log(`Duration: ${summary.ProgramDuration}`);
+      console.log(`Days/Week: ${summary.DaysPerWeek}`);
+      console.log(`Time/Workout: ${summary.TimePerWorkout}`);
+    }
+    ```
+  </Tab>
+
+  <Tab title="React Component">
+    ```typescript
+    import React, { useState, useEffect } from 'react';
+    import { IRoutine, IRoutinesResponse } from './types';
+
+    interface RoutineCardProps {
+      routine: IRoutine;
+    }
+
+    const RoutineCard: React.FC<RoutineCardProps> = ({ routine }) => {
+      const { routine: r } = routine;
+      
+      return (
+        <div className="routine-card">
+          <img src={r.routine_imageUrl} alt={r.routine_title} />
+          <h3>{r.routine_title}</h3>
+          <p>{r.routine_description}</p>
+          
+          <div className="summary">
+            <span>Level: {r.workout_summary.TrainingLevel}</span>
+            <span>Days: {r.workout_summary.DaysPerWeek}/week</span>
+            <span>Duration: {r.workout_summary.ProgramDuration}</span>
+          </div>
+          
+          <div className="categories">
+            {routine.category.map((cat, idx) => (
+              <span key={idx} className="badge">{cat}</span>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    export const RoutineList: React.FC = () => {
+      const [routines, setRoutines] = useState<IRoutine[]>([]);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        async function fetchRoutines() {
+          const response = await fetch('https://api.bodyworks.io/routines');
+          const data: IRoutinesResponse = await response.json();
+          setRoutines(data.data);
+          setLoading(false);
+        }
+
+        fetchRoutines();
+      }, []);
+
+      if (loading) return <div>Loading...</div>;
+
+      return (
+        <div className="routine-list">
+          {routines.map((routine) => (
+            <RoutineCard key={routine.id} routine={routine} />
+          ))}
+        </div>
+      );
+    };
+    ```
+  </Tab>
+
+  <Tab title="Filtering Routines">
+    ```typescript
+    import { IRoutinesResponse, IRoutine } from './types';
+
+    interface RoutineFilters {
+      level?: string;
+      daysPerWeek?: number;
+      goal?: string;
+    }
+
+    function filterRoutines(
+      response: IRoutinesResponse,
+      filters: RoutineFilters
+    ): IRoutine[] {
+      return response.data.filter((routine) => {
+        const summary = routine.routine.workout_summary;
+        
+        if (filters.level && summary.TrainingLevel !== filters.level) {
+          return false;
+        }
+        
+        if (filters.daysPerWeek && summary.DaysPerWeek !== filters.daysPerWeek) {
+          return false;
+        }
+        
+        if (filters.goal && summary.MainGoal !== filters.goal) {
+          return false;
+        }
+        
+        return true;
+      });
+    }
+
+    // Usage
+    const allRoutines = await getRoutines();
+    const beginnerRoutines = filterRoutines(allRoutines, {
+      level: 'Beginner',
+      daysPerWeek: 3
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Type Guards
+
+Create type guards to safely validate routine data:
+
+```typescript
+function isValidWorkoutSummary(obj: any): boolean {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.MainGoal === 'string' &&
+    typeof obj.WorkoutType === 'string' &&
+    typeof obj.TrainingLevel === 'string' &&
+    typeof obj.ProgramDuration === 'string' &&
+    typeof obj.DaysPerWeek === 'number' &&
+    typeof obj.TimePerWorkout === 'string' &&
+    typeof obj.EquipmentRequired === 'string' &&
+    typeof obj.TargetGender === 'string'
+  );
+}
+
+function isValidRoutine(obj: any): obj is IRoutine {
+  return (
+    typeof obj === 'object' &&
+    Array.isArray(obj.category) &&
+    typeof obj.routine === 'object' &&
+    typeof obj.routine.routine_title === 'string' &&
+    typeof obj.routine.routine_description === 'string' &&
+    Array.isArray(obj.routine.workout_plan) &&
+    isValidWorkoutSummary(obj.routine.workout_summary) &&
+    typeof obj.id === 'number' &&
+    typeof obj.id_ === 'number'
+  );
+}
+```

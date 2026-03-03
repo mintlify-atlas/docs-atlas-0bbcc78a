@@ -1,0 +1,168 @@
+---
+title: 'Introduction'
+description: 'Get started with the BodyWorks API - a free, public API for accessing fitness exercises, routines, and workout data'
+---
+
+## Overview
+
+The BodyWorks API provides access to a comprehensive fitness database with over 1300+ exercises and 600+ workout routines. This free, public API allows developers to build fitness applications without authentication requirements.
+
+### What You Can Access
+
+- **1300+ Exercises** - Browse and search exercises with detailed information
+- **30+ Equipment Types** - Filter exercises by available equipment
+- **20 Target Muscles** - Find exercises for specific muscle groups
+- **10 Body Parts** - Organize workouts by body part
+- **600+ Routines** - Pre-built workout routines from 1 week to 52 weeks
+
+## Base URL
+
+The API base URL is configured through an environment variable. By default, it uses:
+
+```typescript
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api/";
+```
+
+<Note>
+  Set `NEXT_PUBLIC_API_BASE_URL` in your environment to point to the BodyWorks API server.
+</Note>
+
+## Response Format
+
+All API responses are returned in JSON format with a consistent structure:
+
+```json
+{
+  "data": [
+    // Array of resources
+  ],
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 10,
+    "totalItems": 100,
+    "limit": 10
+  }
+}
+```
+
+## Available Endpoints
+
+The BodyWorks API provides the following main endpoints:
+
+| Endpoint | Description | Supports Pagination |
+|----------|-------------|---------------------|
+| `/exercises` | Get all exercises | Yes |
+| `/bodyParts` | Get all body parts | Yes |
+| `/equipments` | Get all equipment types | Yes |
+| `/targetMuscles` | Get all target muscles | Yes |
+| `/routines` | Get all workout routines | Yes |
+| `/routineCategory` | Get routine categories | Yes |
+
+### Query Parameters
+
+Most endpoints support the following query parameters:
+
+<ParamField query="limit" type="number" default="9">
+  Number of items to return per page
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  Page number for pagination
+</ParamField>
+
+## Making Requests
+
+The API uses axios for HTTP requests. Here's how the API client is configured:
+
+```typescript lib/apiCaller.ts
+import axios, { AxiosInstance } from "axios";
+
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api/";
+
+interface ApiConfig {
+  baseURL: string;
+}
+
+export const createApi = ({ baseURL }: ApiConfig): AxiosInstance => {
+  if (!baseURL) {
+    throw new Error("API baseURL is required");
+  }
+  return axios.create({
+    baseURL,
+  });
+};
+
+export const apiCaller: AxiosInstance = createApi({ baseURL: API_BASE_URL });
+```
+
+## Example Request
+
+Here's a practical example of fetching exercises with pagination:
+
+```typescript
+import { apiCaller } from "@/lib/apiCaller";
+
+const getExercises = async (
+  limit: number,
+  page: number
+): Promise<IExerciseData> => {
+  const exercises = await apiCaller.get<IExerciseData>("/exercises", {
+    params: {
+      limit,
+      page,
+    },
+  });
+  return exercises.data;
+};
+
+// Fetch first page with 9 exercises
+const data = await getExercises(9, 1);
+```
+
+## Error Handling
+
+The API client includes built-in error handling. If the base URL is not configured, it will throw an error:
+
+```typescript
+if (!baseURL) {
+  throw new Error("API baseURL is required");
+}
+```
+
+### Common Error Responses
+
+<ResponseField name="error" type="object">
+  Error information when a request fails
+  
+  <ResponseField name="message" type="string">
+    Human-readable error message
+  </ResponseField>
+  
+  <ResponseField name="status" type="number">
+    HTTP status code
+  </ResponseField>
+</ResponseField>
+
+## Rate Limiting
+
+<Info>
+  The BodyWorks API is a free public API. Check the [Body Works API repository](https://github.com/Akshat-Jaiswal-8/body-works-api) for current rate limiting policies.
+</Info>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api/authentication">
+    Learn about API access and configuration
+  </Card>
+  <Card title="Exercises" icon="dumbbell" href="/api/exercises">
+    Explore exercise endpoints
+  </Card>
+  <Card title="Routines" icon="calendar" href="/api/routines">
+    Browse workout routines
+  </Card>
+  <Card title="Body Parts" icon="person" href="/api/body-parts">
+    Filter by body parts
+  </Card>
+</CardGroup>

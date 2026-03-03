@@ -1,0 +1,521 @@
+---
+title: useTargetMuscles
+description: React hook for fetching target muscle data with optional limit and automatic caching
+---
+
+## Overview
+
+`useTargetMuscles` is a custom React hook built on React Query that fetches target muscle data from the BodyWorks API. It supports an optional limit parameter for controlling the number of results, making it ideal for muscle group filters, selection interfaces, and reference data displays.
+
+## Hook Signature
+
+```typescript
+const useTargetMuscles = (
+  limit?: number
+) => {
+  const {
+    isLoading,
+    data: targetMuscle,
+    error,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["target-muscle", limit],
+    queryFn: () => getTargetMuscles(limit),
+    placeholderData: keepPreviousData,
+  });
+  return { isLoading, targetMuscle, error, refetch, isRefetching };
+};
+```
+
+## Parameters
+
+<ParamField path="limit" type="number" optional>
+  Optional limit on the number of target muscles to fetch. When omitted, returns all available target muscles.
+</ParamField>
+
+<Note>
+  The `limit` parameter is optional. Call `useTargetMuscles()` without arguments to fetch all target muscles, or specify a number to limit results.
+</Note>
+
+## Return Values
+
+The hook returns an object with the following properties:
+
+<ResponseField name="isLoading" type="boolean">
+  Indicates whether the initial data is being loaded. `true` during the first fetch, `false` once data is available or an error occurs.
+</ResponseField>
+
+<ResponseField name="targetMuscle" type="ITargetMuscleData | undefined">
+  The fetched target muscle data object containing:
+  - `totalTargetMuscles` (number): Total number of target muscles available
+  - `data` (ITargetMuscle[]): Array of target muscle objects
+</ResponseField>
+
+<ResponseField name="error" type="Error | null">
+  Contains error information if the request fails, otherwise `null`.
+</ResponseField>
+
+<ResponseField name="refetch" type="() => Promise<QueryObserverResult>">
+  Function to manually refetch the target muscle data.
+</ResponseField>
+
+<ResponseField name="isRefetching" type="boolean">
+  Indicates whether the data is being refetched. `true` during background updates, `false` otherwise.
+</ResponseField>
+
+## Target Muscle Data Structure
+
+```typescript
+interface ITargetMuscle {
+  targetMuscle: string;  // Target muscle name (e.g., "biceps", "quadriceps", "pectorals")
+  imageUrl: string;      // Image URL for the target muscle
+}
+
+interface ITargetMuscleData {
+  totalTargetMuscles: number;
+  data: ITargetMuscle[];
+}
+```
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Basic Usage">
+    ```tsx
+    import useTargetMuscles from '@/hooks/useTargetMuscles';
+
+    function TargetMuscleList() {
+      const { isLoading, targetMuscle, error } = useTargetMuscles();
+
+      if (isLoading) return <div>Loading target muscles...</div>;
+      if (error) return <div>Error: {error.message}</div>;
+
+      return (
+        <div>
+          <h2>Target Muscles ({targetMuscle?.totalTargetMuscles})</h2>
+          <div className="muscle-grid">
+            {targetMuscle?.data.map((muscle) => (
+              <div key={muscle.targetMuscle} className="muscle-card">
+                <img src={muscle.imageUrl} alt={muscle.targetMuscle} />
+                <h3>{muscle.targetMuscle}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Filter Dropdown">
+    ```tsx
+    import useTargetMuscles from '@/hooks/useTargetMuscles';
+
+    function MuscleFilter({ 
+      onSelect 
+    }: { 
+      onSelect: (muscle: string) => void 
+    }) {
+      const { isLoading, targetMuscle } = useTargetMuscles();
+
+      return (
+        <div className="filter-control">
+          <label htmlFor="muscle-select">Target Muscle:</label>
+          <select 
+            id="muscle-select"
+            onChange={(e) => onSelect(e.target.value)}
+            disabled={isLoading}
+            className="form-select"
+          >
+            <option value="">All Muscles</option>
+            {targetMuscle?.data.map((muscle) => (
+              <option key={muscle.targetMuscle} value={muscle.targetMuscle}>
+                {muscle.targetMuscle.charAt(0).toUpperCase() + 
+                 muscle.targetMuscle.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="With Limit">
+    ```tsx
+    import useTargetMuscles from '@/hooks/useTargetMuscles';
+
+    function PopularMuscles() {
+      // Fetch only the first 6 target muscles
+      const { isLoading, targetMuscle, error } = useTargetMuscles(6);
+
+      return (
+        <section className="popular-muscles">
+          <h3>Popular Target Muscles</h3>
+          {isLoading ? (
+            <div className="loading">Loading...</div>
+          ) : error ? (
+            <div className="error">Error loading muscles</div>
+          ) : (
+            <div className="grid grid-cols-3 gap-4">
+              {targetMuscle?.data.map((muscle) => (
+                <div key={muscle.targetMuscle} className="muscle-item">
+                  <img 
+                    src={muscle.imageUrl} 
+                    alt={muscle.targetMuscle}
+                    className="w-full h-32 object-cover rounded-lg"
+                  />
+                  <p className="mt-2 text-center font-medium">
+                    {muscle.targetMuscle}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Interactive Selector">
+    ```tsx
+    import { useState } from 'react';
+    import useTargetMuscles from '@/hooks/useTargetMuscles';
+
+    function MuscleSelector() {
+      const [selectedMuscles, setSelectedMuscles] = useState<string[]>([]);
+      const { targetMuscle, isLoading } = useTargetMuscles();
+
+      const toggleMuscle = (muscle: string) => {
+        setSelectedMuscles(prev => 
+          prev.includes(muscle)
+            ? prev.filter(m => m !== muscle)
+            : [...prev, muscle]
+        );
+      };
+
+      const isSelected = (muscle: string) => selectedMuscles.includes(muscle);
+
+      return (
+        <div>
+          <h3>Select Target Muscles</h3>
+          <div className="muscle-selector">
+            {targetMuscle?.data.map((muscle) => (
+              <button
+                key={muscle.targetMuscle}
+                onClick={() => toggleMuscle(muscle.targetMuscle)}
+                className={`
+                  muscle-button
+                  ${isSelected(muscle.targetMuscle) ? 'selected' : ''}
+                `}
+              >
+                <img 
+                  src={muscle.imageUrl} 
+                  alt={muscle.targetMuscle}
+                />
+                <span>{muscle.targetMuscle}</span>
+                {isSelected(muscle.targetMuscle) && (
+                  <span className="checkmark">✓</span>
+                )}
+              </button>
+            ))}
+          </div>
+          {selectedMuscles.length > 0 && (
+            <div className="selection-summary">
+              <p>Selected muscles: {selectedMuscles.join(', ')}</p>
+              <button onClick={() => setSelectedMuscles([])}>
+                Clear Selection
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## React Query Features
+
+### Automatic Caching
+
+The hook uses React Query's caching with a query key based on the `limit` parameter:
+
+```typescript
+queryKey: ["target-muscle", limit]
+```
+
+Different limits maintain separate caches:
+- `useTargetMuscles()` caches all target muscles
+- `useTargetMuscles(6)` caches the first 6 target muscles
+- Each query is cached independently
+
+### Placeholder Data
+
+```typescript
+placeholderData: keepPreviousData
+```
+
+Previous data remains visible while new data loads, preventing UI flicker when changing limit values.
+
+### Query Configuration
+
+For reference data like target muscles, you can configure extended cache times:
+
+```tsx
+import { useQuery } from '@tanstack/react-query';
+
+// Custom wrapper with extended cache
+const useTargetMusclesWithCache = (limit?: number) => {
+  return useQuery({
+    queryKey: ["target-muscle", limit],
+    queryFn: () => getTargetMuscles(limit),
+    staleTime: 10 * 60 * 1000,  // 10 minutes
+    cacheTime: 30 * 60 * 1000,   // 30 minutes
+    placeholderData: keepPreviousData,
+  });
+};
+```
+
+## Best Practices
+
+<Tip>
+  **Fetch all for complete filters**: When building comprehensive filter UIs, call `useTargetMuscles()` without arguments to ensure all muscle groups are available.
+</Tip>
+
+<Tip>
+  **Use limit for featured sections**: For homepage highlights or quick-select interfaces, use a small limit (4-8) to reduce initial load time.
+</Tip>
+
+<Tip>
+  **Capitalize muscle names**: Target muscle names are stored in lowercase. Transform them for better presentation:
+  ```tsx
+  const formatMuscleName = (name: string) => {
+    return name.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+  ```
+</Tip>
+
+<Tip>
+  **Group related muscles**: Consider organizing muscles by body region (upper body, lower body, core) for better UX in selection interfaces.
+</Tip>
+
+<Note>
+  Target muscle data is relatively static. Consider implementing longer stale times to reduce API calls and improve performance.
+</Note>
+
+## Common Patterns
+
+### Muscle Group Grid
+
+```tsx
+import useTargetMuscles from '@/hooks/useTargetMuscles';
+import { useNavigate } from 'react-router-dom';
+
+function MuscleGroupGrid() {
+  const { targetMuscle, isLoading } = useTargetMuscles();
+  const navigate = useNavigate();
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-4 gap-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="animate-pulse bg-gray-200 h-40 rounded" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      {targetMuscle?.data.map((muscle) => (
+        <button
+          key={muscle.targetMuscle}
+          onClick={() => navigate(`/exercises?target=${muscle.targetMuscle}`)}
+          className="
+            flex flex-col items-center p-4 
+            border border-gray-200 rounded-lg 
+            hover:border-blue-500 hover:shadow-lg 
+            transition-all duration-200
+          "
+        >
+          <img 
+            src={muscle.imageUrl} 
+            alt={muscle.targetMuscle}
+            className="w-20 h-20 object-contain mb-2"
+          />
+          <span className="text-sm font-medium text-center capitalize">
+            {muscle.targetMuscle}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+```
+
+### Combined Exercise Filter
+
+```tsx
+import { useState } from 'react';
+import useTargetMuscles from '@/hooks/useTargetMuscles';
+import useExercises from '@/hooks/useExercises';
+
+function ExercisesByMuscle() {
+  const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
+  const { targetMuscle } = useTargetMuscles();
+  const { exercises, isLoading } = useExercises(24, 1);
+
+  const filteredExercises = exercises?.data.filter(exercise => 
+    !selectedMuscle || exercise.target === selectedMuscle
+  );
+
+  return (
+    <div className="container mx-auto px-4">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-4">Target Muscles</h2>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedMuscle(null)}
+            className={`
+              px-4 py-2 rounded-full transition
+              ${!selectedMuscle 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-gray-100 hover:bg-gray-200'}
+            `}
+          >
+            All Muscles
+          </button>
+          {targetMuscle?.data.map(muscle => (
+            <button
+              key={muscle.targetMuscle}
+              onClick={() => setSelectedMuscle(muscle.targetMuscle)}
+              className={`
+                px-4 py-2 rounded-full transition capitalize
+                ${selectedMuscle === muscle.targetMuscle 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-100 hover:bg-gray-200'}
+              `}
+            >
+              {muscle.targetMuscle}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {isLoading ? (
+          <p>Loading exercises...</p>
+        ) : filteredExercises?.length === 0 ? (
+          <p>No exercises found for this muscle group.</p>
+        ) : (
+          filteredExercises?.map(exercise => (
+            <ExerciseCard key={exercise.id} exercise={exercise} />
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+### Accordion Filter
+
+```tsx
+import { useState } from 'react';
+import useTargetMuscles from '@/hooks/useTargetMuscles';
+
+function MuscleAccordion() {
+  const [expandedMuscle, setExpandedMuscle] = useState<string | null>(null);
+  const { targetMuscle, isLoading } = useTargetMuscles();
+
+  const toggleMuscle = (muscle: string) => {
+    setExpandedMuscle(prev => prev === muscle ? null : muscle);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+
+  return (
+    <div className="space-y-2">
+      {targetMuscle?.data.map((muscle) => (
+        <div key={muscle.targetMuscle} className="border rounded">
+          <button
+            onClick={() => toggleMuscle(muscle.targetMuscle)}
+            className="
+              w-full flex items-center justify-between 
+              p-4 text-left hover:bg-gray-50
+            "
+          >
+            <div className="flex items-center gap-3">
+              <img 
+                src={muscle.imageUrl} 
+                alt={muscle.targetMuscle}
+                className="w-10 h-10 object-contain"
+              />
+              <span className="font-medium capitalize">
+                {muscle.targetMuscle}
+              </span>
+            </div>
+            <span className="text-gray-500">
+              {expandedMuscle === muscle.targetMuscle ? '−' : '+'}
+            </span>
+          </button>
+          {expandedMuscle === muscle.targetMuscle && (
+            <div className="p-4 border-t bg-gray-50">
+              {/* Exercise list for this muscle */}
+              <ExerciseListByMuscle muscle={muscle.targetMuscle} />
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+### Muscle Badge List
+
+```tsx
+import useTargetMuscles from '@/hooks/useTargetMuscles';
+
+function MuscleBadges({ 
+  selected, 
+  onToggle 
+}: { 
+  selected: string[]; 
+  onToggle: (muscle: string) => void;
+}) {
+  const { targetMuscle } = useTargetMuscles(10);
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {targetMuscle?.data.map((muscle) => (
+        <button
+          key={muscle.targetMuscle}
+          onClick={() => onToggle(muscle.targetMuscle)}
+          className={`
+            inline-flex items-center gap-2 
+            px-3 py-1.5 rounded-full text-sm font-medium
+            transition-all duration-200
+            ${selected.includes(muscle.targetMuscle)
+              ? 'bg-blue-500 text-white shadow-md'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }
+          `}
+        >
+          <img 
+            src={muscle.imageUrl} 
+            alt={muscle.targetMuscle}
+            className="w-4 h-4 object-contain"
+          />
+          <span className="capitalize">{muscle.targetMuscle}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+```

@@ -1,0 +1,230 @@
+---
+title: 'Get Routines'
+api: 'GET /routines'
+description: 'Retrieve a paginated list of workout routines'
+---
+
+## Endpoint
+
+```
+GET /api/routines
+```
+
+Retrieve a paginated list of workout routines from the BodyWorks database. Each routine includes a complete workout plan with daily schedules and workout summaries.
+
+## Query Parameters
+
+<ParamField query="limit" type="number" required>
+  The number of routines to return per page. Controls pagination size.
+</ParamField>
+
+<ParamField query="page" type="number" required>
+  The page number to retrieve. Used for pagination through the routine list.
+</ParamField>
+
+## Response
+
+<ResponseField name="totalRoutines" type="number">
+  The total number of routines available in the database.
+</ResponseField>
+
+<ResponseField name="totalPages" type="number">
+  The total number of pages available based on the limit parameter.
+</ResponseField>
+
+<ResponseField name="data" type="IRoutine[]">
+  An array of routine objects.
+  
+  <Expandable title="Routine Object">
+    <ResponseField name="id" type="number">
+      The unique identifier for the routine.
+    </ResponseField>
+    
+    <ResponseField name="id_" type="number">
+      Alternative identifier for the routine.
+    </ResponseField>
+    
+    <ResponseField name="category" type="string[]">
+      Array of categories this routine belongs to (e.g., ["strength", "mass-building"]).
+    </ResponseField>
+    
+    <ResponseField name="routine" type="object">
+      The main routine object containing all routine details.
+      
+      <Expandable title="Routine Details">
+        <ResponseField name="routine_title" type="string">
+          The title of the workout routine.
+        </ResponseField>
+        
+        <ResponseField name="routine_description" type="string">
+          Detailed description of the routine, including goals and methodology.
+        </ResponseField>
+        
+        <ResponseField name="routine_imageUrl" type="string">
+          URL to the routine's featured image.
+        </ResponseField>
+        
+        <ResponseField name="workout_plan" type="object[]">
+          Array of daily workout plans.
+          
+          <Expandable title="Workout Plan">
+            <ResponseField name="heading" type="string">
+              The day or phase heading (e.g., "Day 1: Chest & Triceps").
+            </ResponseField>
+            
+            <ResponseField name="day_plan" type="string">
+              Detailed plan for this day including exercises, sets, and reps.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="workout_summary" type="object">
+          Summary of the routine's key characteristics.
+          
+          <Expandable title="Workout Summary">
+            <ResponseField name="MainGoal" type="string">
+              The primary goal of the routine (e.g., "Build Muscle", "Lose Fat").
+            </ResponseField>
+            
+            <ResponseField name="WorkoutType" type="string">
+              The type of workout (e.g., "Split", "Full Body").
+            </ResponseField>
+            
+            <ResponseField name="TrainingLevel" type="string">
+              Target experience level (e.g., "Beginner", "Intermediate", "Advanced").
+            </ResponseField>
+            
+            <ResponseField name="ProgramDuration" type="string">
+              Total duration of the program (e.g., "8 weeks", "12 weeks").
+            </ResponseField>
+            
+            <ResponseField name="DaysPerWeek" type="number">
+              Number of training days per week.
+            </ResponseField>
+            
+            <ResponseField name="TimePerWorkout" type="string">
+              Average time per workout session (e.g., "45-60 minutes").
+            </ResponseField>
+            
+            <ResponseField name="EquipmentRequired" type="string">
+              Equipment needed for the routine (e.g., "Full Gym", "Dumbbells Only").
+            </ResponseField>
+            
+            <ResponseField name="TargetGender" type="string">
+              Target gender for the routine (e.g., "Male", "Female", "Unisex").
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    curl -X GET "https://api.bodyworks.com/api/routines?limit=10&page=1"
+    ```
+  </Tab>
+  
+  <Tab title="axios">
+    ```javascript
+    import axios from 'axios';
+
+    const getRoutines = async (limit = 10, page = 1) => {
+      const response = await axios.get('/api/routines', {
+        params: {
+          limit,
+          page
+        }
+      });
+      return response.data;
+    };
+
+    // Usage
+    const routines = await getRoutines(10, 1);
+    ```
+  </Tab>
+  
+  <Tab title="fetch">
+    ```javascript
+    const getRoutines = async (limit = 10, page = 1) => {
+      const response = await fetch(
+        `/api/routines?limit=${limit}&page=${page}`
+      );
+      const data = await response.json();
+      return data;
+    };
+
+    // Usage
+    const routines = await getRoutines(10, 1);
+    ```
+  </Tab>
+</Tabs>
+
+## Example Response
+
+```json
+{
+  "totalRoutines": 156,
+  "totalPages": 16,
+  "data": [
+    {
+      "id": 1,
+      "id_": 1,
+      "category": ["strength", "mass-building"],
+      "routine": {
+        "routine_title": "5x5 Strength Training Program",
+        "routine_description": "A classic strength-building program focused on compound movements. This routine is designed to build maximum strength through progressive overload on the big three lifts: squat, bench press, and deadlift.",
+        "routine_imageUrl": "https://cdn.bodyworks.com/routines/5x5-program.jpg",
+        "workout_plan": [
+          {
+            "heading": "Day 1: Workout A",
+            "day_plan": "Squat 5x5, Bench Press 5x5, Barbell Row 5x5"
+          },
+          {
+            "heading": "Day 2: Workout B",
+            "day_plan": "Squat 5x5, Overhead Press 5x5, Deadlift 1x5"
+          },
+          {
+            "heading": "Day 3: Workout A",
+            "day_plan": "Squat 5x5, Bench Press 5x5, Barbell Row 5x5"
+          }
+        ],
+        "workout_summary": {
+          "MainGoal": "Build Strength",
+          "WorkoutType": "Full Body",
+          "TrainingLevel": "Beginner",
+          "ProgramDuration": "12 weeks",
+          "DaysPerWeek": 3,
+          "TimePerWorkout": "45-60 minutes",
+          "EquipmentRequired": "Barbell, Squat Rack, Bench",
+          "TargetGender": "Unisex"
+        }
+      }
+    }
+  ]
+}
+```
+
+## Error Responses
+
+<ResponseField name="400 Bad Request">
+  ```json
+  {
+    "error": "Invalid pagination parameters",
+    "message": "Limit and page must be positive integers"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error">
+  ```json
+  {
+    "error": "Internal server error",
+    "message": "Failed to fetch routines from database"
+  }
+  ```
+</ResponseField>

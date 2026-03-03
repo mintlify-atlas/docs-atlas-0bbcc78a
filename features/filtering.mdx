@@ -1,0 +1,437 @@
+---
+title: Filtering exercises
+description: Filter 1300+ exercises by body part, equipment, and target muscles
+---
+
+## Overview
+
+BodyWorks provides powerful filtering capabilities to help you find exactly the exercises you need. With **10+ body parts**, **30+ equipment types**, and **20+ target muscles**, you can quickly narrow down the exercise database to match your workout requirements.
+
+<CardGroup cols={3}>
+  <Card title="Body parts" icon="person" href="#filter-by-body-part">
+    10+ major body parts including chest, back, legs, and more
+  </Card>
+  <Card title="Equipment" icon="weight-hanging" href="#filter-by-equipment">
+    30+ equipment types from barbells to bodyweight
+  </Card>
+  <Card title="Target muscles" icon="heart-pulse" href="#filter-by-target-muscle">
+    20+ specific muscle groups for precise targeting
+  </Card>
+</CardGroup>
+
+## Filter by body part
+
+Body part filtering groups exercises by the main area of the body being trained.
+
+### Available body parts
+
+BodyWorks organizes exercises into 10+ major body part categories:
+
+- **Upper body**
+  - Chest
+  - Back
+  - Shoulders
+  - Arms
+  
+- **Lower body**
+  - Legs
+  - Glutes
+  
+- **Core**
+  - Abs
+  - Waist
+  
+- **Full body**
+  - Cardio
+  - Compound movements
+
+<Note>
+  Body part categories help you build balanced workouts by ensuring you train all major muscle groups throughout the week.
+</Note>
+
+### How it works
+
+The body part filter is implemented with dedicated pages:
+
+```typescript body-parts/[body-part]/page.tsx
+function BodyPartContent() {
+  const params = useParams();
+  const searchParams = useSearchParams();
+  
+  const bodypart = params?.["body-part"] as string;
+  const page = Number(searchParams?.get("page")) || 1;
+  
+  const { isLoading, bodyPart, error, refetch, isRefetching } = useBodyPart(
+    bodypart,
+    9,
+    page
+  );
+  
+  return (
+    <section className="space-y-12 mb-12">
+      <div className="grid w-full lg:grid-cols-2 xl:grid-cols-3">
+        {bodyPart?.data.map((bodyPart: IExercise) => {
+          return (
+            <DescriptedCard
+              id={bodyPart.id_}
+              key={bodyPart.id_}
+              gif={bodyPart.gifUrl}
+              title={bodyPart.title}
+              blog={bodyPart.blog}
+            />
+          );
+        })}
+      </div>
+      <PaginationProvidor
+        currentPage={page}
+        totalPages={bodyPart?.totalPages || 0}
+      />
+    </section>
+  );
+}
+```
+
+### Using body part filters
+
+<Steps>
+  <Step title="Browse all body parts">
+    Visit `/body-parts` to see all available body part categories with images
+  </Step>
+  
+  <Step title="Select a body part">
+    Click on any body part card (e.g., chest, legs, back)
+  </Step>
+  
+  <Step title="View filtered exercises">
+    See all exercises targeting that body part at `/body-parts/{body-part}`
+  </Step>
+  
+  <Step title="Paginate through results">
+    Use pagination controls to browse all matching exercises (9 per page)
+  </Step>
+</Steps>
+
+## Filter by equipment
+
+Equipment filtering helps you find exercises based on what's available in your gym or home setup.
+
+### Available equipment types
+
+BodyWorks includes 30+ equipment categories:
+
+<Tabs>
+  <Tab title="Free weights">
+    - Barbell
+    - Dumbbell
+    - Kettlebell
+    - Medicine ball
+    - Olympic barbell
+    - EZ bar
+  </Tab>
+  
+  <Tab title="Machines">
+    - Cable machine
+    - Smith machine
+    - Leg press
+    - Lat pulldown
+    - Chest press machine
+    - Leg curl machine
+    - Leg extension machine
+  </Tab>
+  
+  <Tab title="Resistance">
+    - Resistance bands
+    - Suspension trainer (TRX)
+    - Weight plate
+  </Tab>
+  
+  <Tab title="Bodyweight & cardio">
+    - Bodyweight (no equipment)
+    - Pull-up bar
+    - Dip bars
+    - Treadmill
+    - Stationary bike
+    - Rowing machine
+    - Jump rope
+  </Tab>
+  
+  <Tab title="Specialty">
+    - Foam roller
+    - Stability ball
+    - Bosu ball
+    - Battle ropes
+    - Sled
+    - Box (plyometric)
+  </Tab>
+</Tabs>
+
+### Implementation
+
+Equipment filtering uses dynamic routing:
+
+```typescript equipments/[equipment]/page.tsx
+function EquipmentContent() {
+  const params = useParams();
+  const searchParams = useSearchParams();
+  
+  const page = Number(searchParams?.get("page")) || 1;
+  const searchedEquipment = params?.equipment as string;
+  
+  const { equipment, isLoading, error, refetch, isRefetching } = useEquipment(
+    searchedEquipment,
+    9,
+    page
+  );
+  
+  return (
+    <section className="space-y-12 mb-12">
+      <div className={"w-full lg:grid lg:grid-cols-2 2xl:grid-cols-3"}>
+        {equipment?.data.map((Equipment: IExercise) => {
+          return (
+            <DescriptedCard
+              id={Equipment.id_}
+              key={Equipment.id_}
+              gif={Equipment.gifUrl}
+              title={Equipment.title}
+              blog={Equipment.blog}
+            />
+          );
+        })}
+      </div>
+      <PaginationProvidor
+        currentPage={page}
+        totalPages={equipment?.totalPages || 0}
+      />
+    </section>
+  );
+}
+```
+
+### Using equipment filters
+
+<Steps>
+  <Step title="View all equipment types">
+    Navigate to `/equipments` to see all 30+ equipment categories
+  </Step>
+  
+  <Step title="Choose equipment">
+    Click on the equipment type you have access to (e.g., dumbbell, barbell)
+  </Step>
+  
+  <Step title="Browse exercises">
+    View all exercises that use that equipment at `/equipments/{equipment}`
+  </Step>
+  
+  <Step title="Navigate pages">
+    Use pagination to see all matching exercises
+  </Step>
+</Steps>
+
+<Note>
+  Equipment filtering is especially useful for:
+  - Home gym setups with limited equipment
+  - Hotel/travel workouts with bodyweight only
+  - Gyms with specific equipment availability
+  - Progressive overload planning (e.g., starting with machines, moving to free weights)
+</Note>
+
+## Filter by target muscle
+
+Target muscle filtering provides the most precise exercise selection based on specific muscle groups.
+
+### Available target muscles
+
+BodyWorks categorizes exercises by 20+ specific target muscles:
+
+<AccordionGroup>
+  <Accordion title="Upper body muscles">
+    - **Chest**: pectorals
+    - **Back**: latissimus dorsi, traps, rhomboids
+    - **Shoulders**: anterior deltoids, lateral deltoids, posterior deltoids
+    - **Arms**: biceps, triceps, forearms, brachialis
+  </Accordion>
+  
+  <Accordion title="Lower body muscles">
+    - **Quads**: quadriceps, vastus lateralis
+    - **Hamstrings**: biceps femoris, hamstrings
+    - **Glutes**: gluteus maximus, gluteus medius
+    - **Calves**: gastrocnemius, soleus
+    - **Hip flexors**: iliopsoas
+  </Accordion>
+  
+  <Accordion title="Core muscles">
+    - **Abs**: rectus abdominis, transverse abdominis
+    - **Obliques**: internal obliques, external obliques
+    - **Lower back**: erector spinae
+    - **Serratus**: serratus anterior
+  </Accordion>
+</AccordionGroup>
+
+### Implementation
+
+Target muscle filtering follows the same pattern:
+
+```typescript target-muscles/[target-muscle]/page.tsx
+function TargetMuscleContent() {
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const searchTargetMuscle = params?.["target-muscle"] as string;
+  
+  const page = Number(searchParams?.get("page")) || 1;
+  
+  const { targetMuscle, isLoading, error, refetch, isRefetching } =
+    useTargetMuscle(searchTargetMuscle, 9, page);
+  
+  return (
+    <section className="space-y-12 mb-12">
+      <div className="grid w-full lg:grid-cols-2 xl:grid-cols-3">
+        {targetMuscle?.data.map((targetMuscle: IExercise) => {
+          return (
+            <DescriptedCard
+              id={targetMuscle.id_}
+              key={targetMuscle.id_}
+              gif={targetMuscle.gifUrl}
+              title={targetMuscle.title}
+              blog={targetMuscle.blog}
+            />
+          );
+        })}
+      </div>
+      <PaginationProvidor
+        currentPage={page}
+        totalPages={targetMuscle?.totalPages || 0}
+      />
+    </section>
+  );
+}
+```
+
+### Using target muscle filters
+
+<Steps>
+  <Step title="Access muscle library">
+    Go to `/target-muscles` to see all 20+ target muscle categories
+  </Step>
+  
+  <Step title="Select target muscle">
+    Click on the specific muscle you want to train (e.g., pectorals, quadriceps)
+  </Step>
+  
+  <Step title="View targeted exercises">
+    Browse exercises at `/target-muscles/{target-muscle}` that specifically target that muscle
+  </Step>
+  
+  <Step title="Page through results">
+    Use pagination controls to explore all matching exercises
+  </Step>
+</Steps>
+
+## How filters work together
+
+While BodyWorks implements individual filter types separately, you can combine them strategically:
+
+### Building comprehensive workouts
+
+<CodeGroup>
+```text Chest day example
+1. Filter by body part: "chest"
+   → See all chest exercises
+
+2. Filter by equipment: "dumbbell"
+   → Find dumbbell chest exercises
+
+3. Filter by target: "pectorals"
+   → Isolate pectoral-focused movements
+```
+
+```text Home workout example
+1. Filter by equipment: "bodyweight"
+   → See all bodyweight exercises
+
+2. Browse by body part categories
+   → Build full-body routine with no equipment
+```
+
+```text Muscle building example  
+1. Filter by target: "quadriceps"
+   → Find quad-focused exercises
+
+2. Check equipment requirements
+   → Select based on available equipment
+
+3. Add to workout routine
+   → Build complete leg day
+```
+</CodeGroup>
+
+### Filter data structure
+
+Each filter category has its own data structure:
+
+```typescript types.d.ts
+interface IBodyPart {
+  bodyPart: string;      // Body part name
+  imageUrl: string;      // Category image
+}
+
+interface IEquipment {
+  equipment: string;     // Equipment name
+  imageUrl: string;      // Category image
+}
+
+interface ITargetMuscle {
+  targetMuscle: string;  // Muscle name
+  imageUrl: string;      // Category image
+}
+```
+
+## Filter navigation
+
+Filters are accessible throughout the platform:
+
+### Homepage preview
+
+The homepage (`features.tsx`) displays preview cards for each filter type:
+
+- **1300+ Exercises**: Link to all exercises
+- **10+ Body Parts**: Link to body part categories
+- **20+ Target Muscles**: Link to muscle categories  
+- **30+ Equipments**: Link to equipment categories
+
+Each section shows 3 sample items with images and links to explore more.
+
+### Dedicated category pages
+
+Every filter type has its own overview page:
+
+- `/body-parts` - Grid of all body part cards
+- `/equipments` - Grid of all equipment cards
+- `/target-muscles` - Grid of all target muscle cards
+
+### URL patterns
+
+Filtered exercise lists follow consistent URL patterns:
+
+```text
+/body-parts/{body-part-name}       → e.g., /body-parts/chest
+/equipments/{equipment-name}       → e.g., /equipments/barbell
+/target-muscles/{muscle-name}      → e.g., /target-muscles/pectorals
+```
+
+<Warning>
+  Filter names in URLs are case-sensitive and use lowercase with hyphens for multi-word filters (e.g., `anterior-deltoids`).
+</Warning>
+
+## Responsive design
+
+All filter pages adapt to different screen sizes:
+
+- **Mobile (xs)**: Single column layout
+- **Tablet (lg)**: 2-column grid
+- **Desktop (xl/2xl)**: 3-column grid
+
+Pagination ensures smooth browsing with 9 exercises per page across all devices.
+
+<Card title="Next: Learn about search" icon="magnifying-glass" href="/features/search">
+  Master the search functionality to find exercises by name and keywords
+</Card>

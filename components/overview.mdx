@@ -1,0 +1,250 @@
+---
+title: "Components Overview"
+description: "Understanding BodyWorks component architecture and design system"
+---
+
+## Architecture
+
+BodyWorks uses a layered component architecture that combines Shadcn UI components with custom fitness-specific components and Aceternity UI for advanced animations.
+
+### Component Layers
+
+The component system is organized into three distinct layers:
+
+1. **Base UI Layer** - Shadcn UI components (New York style)
+2. **Custom Component Layer** - Fitness-specific components
+3. **Animation Layer** - Aceternity UI components
+
+```typescript
+// Component configuration from components.json
+{
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "iconLibrary": "lucide"
+}
+```
+
+## Shadcn UI Integration
+
+BodyWorks uses Shadcn UI as the foundation for its component library, configured with the **New York** style variant.
+
+### Configuration
+
+<AccordionGroup>
+  <Accordion title="Base Configuration">
+    - **Style**: New York variant
+    - **RSC**: React Server Components enabled
+    - **TypeScript**: Full TypeScript support
+    - **Base Color**: Neutral palette
+    - **CSS Variables**: Enabled for theming
+  </Accordion>
+
+  <Accordion title="Path Aliases">
+    ```typescript
+    @/components  → components/
+    @/utils       → lib/utils
+    @/ui          → components/ui/
+    @/lib         → lib/
+    @/hooks       → hooks/
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Custom Component Structure
+
+Custom components are built on top of base UI components and follow a consistent pattern:
+
+### Component Patterns
+
+<CardGroup cols={2}>
+  <Card title="Card Components" icon="square">
+    - exercise-card.tsx
+    - routine-card.tsx
+    - descripted-card.tsx
+    - testimonial-card.tsx
+  </Card>
+
+  <Card title="Interactive Components" icon="hand-pointer">
+    - search-bar.tsx
+    - navbar.tsx
+    - footer-navbar.tsx
+    - mode-toggle.tsx
+  </Card>
+
+  <Card title="Data Display" icon="table">
+    - workout-summary-table.tsx
+    - pagination-providor.tsx
+    - data-loading-skeleton.tsx
+  </Card>
+
+  <Card title="Utility Components" icon="wrench">
+    - theme-provider.tsx
+    - hint.tsx
+    - custom-spinner.tsx
+  </Card>
+</CardGroup>
+
+### Naming Conventions
+
+Components follow these naming patterns:
+
+- **UI Components**: kebab-case (e.g., `button.tsx`, `3d-card.tsx`)
+- **Custom Components**: kebab-case with descriptive names (e.g., `exercise-card.tsx`)
+- **React Components**: PascalCase exports (e.g., `ExerciseCard`, `SearchBar`)
+
+## Styling Approach
+
+BodyWorks uses **Tailwind CSS** with a custom configuration and CSS variable-based theming.
+
+### Tailwind Configuration
+
+```typescript
+// Using class variance authority for component variants
+import { cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2...",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground...",
+        destructive: "bg-destructive text-white...",
+        outline: "border bg-background...",
+      },
+      size: {
+        default: "h-9 px-4 py-2",
+        sm: "h-8 rounded-md gap-1.5 px-3",
+        lg: "h-10 rounded-md px-6",
+      },
+    },
+  }
+);
+```
+
+### Utility Function
+
+The `cn()` utility merges Tailwind classes with proper precedence:
+
+```typescript
+import { cn } from "@/lib/utils";
+
+<div className={cn(
+  "base-classes",
+  condition && "conditional-classes",
+  className // Allow prop override
+)} />
+```
+
+### Theme System
+
+<Tabs>
+  <Tab title="Light Mode">
+    ```css
+    :root {
+      --primary: 0 0% 9%;
+      --secondary: 0 0% 96.1%;
+      --accent: 0 0% 96.1%;
+      --destructive: 0 84.2% 60.2%;
+      --border: 0 0% 89.8%;
+      --ring: 0 0% 63.9%;
+    }
+    ```
+  </Tab>
+
+  <Tab title="Dark Mode">
+    ```css
+    .dark {
+      --primary: 0 0% 98%;
+      --secondary: 0 0% 14.9%;
+      --accent: 0 0% 14.9%;
+      --destructive: 0 62.8% 30.6%;
+      --border: 0 0% 14.9%;
+      --ring: 0 0% 83.1%;
+    }
+    ```
+  </Tab>
+
+  <Tab title="Custom Colors">
+    ```tsx
+    // Light mode shadows
+    shadow-amber-900
+    shadow-amber-700
+
+    // Dark mode shadows
+    dark:shadow-pink-500
+    dark:shadow-emerald-500/10
+    ```
+  </Tab>
+</Tabs>
+
+## Component Composition
+
+BodyWorks components are highly composable, allowing for flexible layouts:
+
+```tsx
+import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+
+export function ExerciseCard({ name, image }: Props) {
+  return (
+    <CardContainer>
+      <CardBody className="group/card ...">
+        <CardItem translateZ="100">
+          <Image src={image} alt={name} />
+        </CardItem>
+        <CardItem className="text-xl font-bold">
+          {name}
+        </CardItem>
+      </CardBody>
+    </CardContainer>
+  );
+}
+```
+
+## Accessibility
+
+All components follow accessibility best practices:
+
+- Semantic HTML elements
+- ARIA attributes where needed
+- Keyboard navigation support
+- Focus management
+- Screen reader compatibility
+
+```tsx
+// Example: Button with proper ARIA attributes
+<button
+  data-slot="button"
+  aria-invalid={isInvalid}
+  className={cn(buttonVariants({ variant, size }))}
+>
+  {children}
+</button>
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="UI Library" icon="book" href="/components/ui-library">
+    Explore available UI components and their usage
+  </Card>
+
+  <Card title="React Hooks" icon="link" href="/components/hooks">
+    Learn about custom hooks for data fetching and utilities
+  </Card>
+</CardGroup>

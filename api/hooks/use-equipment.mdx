@@ -1,0 +1,463 @@
+---
+title: useEquipment
+description: React hook for fetching equipment data with optional limit and automatic caching
+---
+
+## Overview
+
+`useEquipments` is a custom React hook built on React Query that fetches equipment data from the BodyWorks API. It supports an optional limit parameter for controlling the number of results, making it suitable for filters, reference lists, and equipment selection interfaces.
+
+## Hook Signature
+
+```typescript
+const useEquipments = (
+  limit?: number
+) => {
+  const {
+    isLoading,
+    data: equipments,
+    error,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["equipments", limit],
+    queryFn: () => getEquipments(limit),
+    placeholderData: keepPreviousData,
+  });
+  return { isLoading, equipments, error, refetch, isRefetching };
+};
+```
+
+## Parameters
+
+<ParamField path="limit" type="number" optional>
+  Optional limit on the number of equipment items to fetch. When omitted, returns all available equipment.
+</ParamField>
+
+<Note>
+  The `limit` parameter is optional. Call `useEquipments()` without arguments to fetch all equipment, or specify a number to limit results.
+</Note>
+
+## Return Values
+
+The hook returns an object with the following properties:
+
+<ResponseField name="isLoading" type="boolean">
+  Indicates whether the initial data is being loaded. `true` during the first fetch, `false` once data is available or an error occurs.
+</ResponseField>
+
+<ResponseField name="equipments" type="IEquipmentData | undefined">
+  The fetched equipment data object containing:
+  - `totalEquipments` (number): Total number of equipment items available
+  - `data` (IEquipment[]): Array of equipment objects
+</ResponseField>
+
+<ResponseField name="error" type="Error | null">
+  Contains error information if the request fails, otherwise `null`.
+</ResponseField>
+
+<ResponseField name="refetch" type="() => Promise<QueryObserverResult>">
+  Function to manually refetch the equipment data.
+</ResponseField>
+
+<ResponseField name="isRefetching" type="boolean">
+  Indicates whether the data is being refetched. `true` during background updates, `false` otherwise.
+</ResponseField>
+
+## Equipment Data Structure
+
+```typescript
+interface IEquipment {
+  equipment: string;    // Equipment name (e.g., "barbell", "dumbbell", "bodyweight")
+  imageUrl: string;     // Image URL for the equipment
+}
+
+interface IEquipmentData {
+  totalEquipments: number;
+  data: IEquipment[];
+}
+```
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Basic Usage">
+    ```tsx
+    import useEquipments from '@/hooks/useEquipments';
+
+    function EquipmentList() {
+      const { isLoading, equipments, error } = useEquipments();
+
+      if (isLoading) return <div>Loading equipment...</div>;
+      if (error) return <div>Error: {error.message}</div>;
+
+      return (
+        <div>
+          <h2>Available Equipment ({equipments?.totalEquipments})</h2>
+          <div className="equipment-grid">
+            {equipments?.data.map((item) => (
+              <div key={item.equipment} className="equipment-card">
+                <img src={item.imageUrl} alt={item.equipment} />
+                <h3>{item.equipment}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Filter Dropdown">
+    ```tsx
+    import useEquipments from '@/hooks/useEquipments';
+
+    function EquipmentFilter({ 
+      onSelect 
+    }: { 
+      onSelect: (equipment: string) => void 
+    }) {
+      const { isLoading, equipments } = useEquipments();
+
+      return (
+        <div className="filter">
+          <label htmlFor="equipment">Equipment:</label>
+          <select 
+            id="equipment"
+            onChange={(e) => onSelect(e.target.value)}
+            disabled={isLoading}
+          >
+            <option value="">All Equipment</option>
+            {equipments?.data.map((item) => (
+              <option key={item.equipment} value={item.equipment}>
+                {item.equipment.charAt(0).toUpperCase() + item.equipment.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="With Limit">
+    ```tsx
+    import useEquipments from '@/hooks/useEquipments';
+
+    function FeaturedEquipment() {
+      // Fetch only the first 4 equipment items
+      const { isLoading, equipments, error } = useEquipments(4);
+
+      return (
+        <section>
+          <h3>Featured Equipment</h3>
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : error ? (
+            <div>Error loading equipment</div>
+          ) : (
+            <div className="flex gap-4">
+              {equipments?.data.map((item) => (
+                <div key={item.equipment} className="equipment-item">
+                  <img 
+                    src={item.imageUrl} 
+                    alt={item.equipment}
+                    className="w-24 h-24 object-cover rounded"
+                  />
+                  <p className="mt-2 text-sm font-medium">
+                    {item.equipment}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Filter Chips">
+    ```tsx
+    import { useState } from 'react';
+    import useEquipments from '@/hooks/useEquipments';
+
+    function EquipmentFilterChips() {
+      const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
+      const { equipments, isLoading } = useEquipments();
+
+      const toggleEquipment = (equipment: string) => {
+        setSelectedEquipment(prev => 
+          prev.includes(equipment)
+            ? prev.filter(e => e !== equipment)
+            : [...prev, equipment]
+        );
+      };
+
+      return (
+        <div>
+          <h3>Filter by Equipment</h3>
+          <div className="flex flex-wrap gap-2">
+            {equipments?.data.map((item) => (
+              <button
+                key={item.equipment}
+                onClick={() => toggleEquipment(item.equipment)}
+                className={`
+                  px-4 py-2 rounded-full border
+                  ${selectedEquipment.includes(item.equipment)
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'bg-white text-gray-700 border-gray-300'
+                  }
+                `}
+              >
+                {item.equipment}
+              </button>
+            ))}
+          </div>
+          {selectedEquipment.length > 0 && (
+            <p className="mt-2 text-sm text-gray-600">
+              Selected: {selectedEquipment.join(', ')}
+            </p>
+          )}
+        </div>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## React Query Features
+
+### Automatic Caching
+
+The hook uses React Query's caching with a query key based on the `limit` parameter:
+
+```typescript
+queryKey: ["equipments", limit]
+```
+
+Different limits create separate cache entries:
+- `useEquipments()` caches all equipment
+- `useEquipments(4)` caches the first 4 equipment items
+- Both queries maintain independent caches
+
+### Placeholder Data
+
+```typescript
+placeholderData: keepPreviousData
+```
+
+When switching between different limit values, previous data remains visible until new data loads.
+
+### Background Refetching
+
+React Query automatically refetches equipment data when:
+- The browser window regains focus
+- The network reconnects
+- The cache becomes stale (configurable)
+
+Use `isRefetching` to show subtle loading indicators during background updates.
+
+## Best Practices
+
+<Tip>
+  **Fetch all for filters**: When building filter UIs, call `useEquipments()` without arguments to ensure all equipment options are available to users.
+</Tip>
+
+<Tip>
+  **Use limit for previews**: For featured sections or quick-select interfaces, use a small limit (e.g., 4-6) to reduce data transfer.
+</Tip>
+
+<Tip>
+  **Display formatted names**: Equipment names are stored in lowercase. Transform them for display:
+  ```tsx
+  {equipment.equipment.split(' ').map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(' ')}
+  ```
+</Tip>
+
+<Tip>
+  **Consider icons**: For common equipment types, consider using icons alongside or instead of images for faster loading and cleaner UI.
+</Tip>
+
+<Note>
+  Equipment data is relatively static reference data. Consider configuring longer stale times to minimize unnecessary API calls.
+</Note>
+
+## Common Patterns
+
+### Equipment Grid with Images
+
+```tsx
+import useEquipments from '@/hooks/useEquipments';
+import { useNavigate } from 'react-router-dom';
+
+function EquipmentGrid() {
+  const { equipments, isLoading } = useEquipments();
+  const navigate = useNavigate();
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-4 gap-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="skeleton h-32" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {equipments?.data.map((item) => (
+        <button
+          key={item.equipment}
+          onClick={() => navigate(`/exercises?equipment=${item.equipment}`)}
+          className="group p-4 border rounded-lg hover:border-blue-500 transition"
+        >
+          <img 
+            src={item.imageUrl} 
+            alt={item.equipment}
+            className="w-full h-24 object-contain mb-2"
+          />
+          <p className="text-sm font-medium group-hover:text-blue-500">
+            {item.equipment}
+          </p>
+        </button>
+      ))}
+    </div>
+  );
+}
+```
+
+### Combined with Exercise Filter
+
+```tsx
+import { useState } from 'react';
+import useEquipments from '@/hooks/useEquipments';
+import useExercises from '@/hooks/useExercises';
+
+function FilteredExercises() {
+  const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null);
+  const { equipments } = useEquipments();
+  const { exercises, isLoading } = useExercises(20, 1);
+
+  const filteredExercises = exercises?.data.filter(exercise => 
+    !selectedEquipment || exercise.equipment === selectedEquipment
+  );
+
+  return (
+    <div>
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-2">Filter by Equipment</h3>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedEquipment(null)}
+            className={`px-4 py-2 rounded ${
+              !selectedEquipment ? 'bg-blue-500 text-white' : 'bg-gray-200'
+            }`}
+          >
+            All
+          </button>
+          {equipments?.data.map(item => (
+            <button
+              key={item.equipment}
+              onClick={() => setSelectedEquipment(item.equipment)}
+              className={`px-4 py-2 rounded ${
+                selectedEquipment === item.equipment 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-200'
+              }`}
+            >
+              {item.equipment}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        {isLoading ? (
+          <p>Loading exercises...</p>
+        ) : (
+          filteredExercises?.map(exercise => (
+            <ExerciseCard key={exercise.id} exercise={exercise} />
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+### Radio Button Group
+
+```tsx
+import { useState } from 'react';
+import useEquipments from '@/hooks/useEquipments';
+
+function EquipmentSelector() {
+  const [selected, setSelected] = useState<string>('');
+  const { equipments, isLoading } = useEquipments();
+
+  return (
+    <fieldset>
+      <legend className="text-lg font-semibold mb-2">
+        Select Equipment
+      </legend>
+      {isLoading ? (
+        <p>Loading options...</p>
+      ) : (
+        <div className="space-y-2">
+          {equipments?.data.map((item) => (
+            <label 
+              key={item.equipment}
+              className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded"
+            >
+              <input
+                type="radio"
+                name="equipment"
+                value={item.equipment}
+                checked={selected === item.equipment}
+                onChange={(e) => setSelected(e.target.value)}
+                className="w-4 h-4"
+              />
+              <img 
+                src={item.imageUrl} 
+                alt={item.equipment}
+                className="w-8 h-8 object-contain"
+              />
+              <span className="capitalize">{item.equipment}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </fieldset>
+  );
+}
+```
+
+### Lazy Loading Images
+
+```tsx
+import useEquipments from '@/hooks/useEquipments';
+
+function LazyEquipmentList() {
+  const { equipments } = useEquipments();
+
+  return (
+    <div className="equipment-list">
+      {equipments?.data.map((item) => (
+        <div key={item.equipment} className="equipment-item">
+          <img 
+            src={item.imageUrl} 
+            alt={item.equipment}
+            loading="lazy"
+            className="equipment-image"
+          />
+          <h3>{item.equipment}</h3>
+        </div>
+      ))}
+    </div>
+  );
+}
+```

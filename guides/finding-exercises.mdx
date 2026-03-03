@@ -1,0 +1,204 @@
+---
+title: Finding Exercises
+description: Learn how to browse, filter, and search for exercises in BodyWorks
+---
+
+BodyWorks offers a comprehensive exercise database with multiple ways to find the perfect exercises for your workout. Whether you're looking for exercises targeting specific body parts, using particular equipment, or focusing on certain muscles, this guide will show you how to navigate and filter exercises effectively.
+
+## Browse All Exercises
+
+<Steps>
+  <Step title="Navigate to Exercises">
+    From the navigation bar, hover over **Exercises** and select **All Exercises**, or visit `/exercises` directly.
+
+    You'll see a paginated grid view of all available exercises with:
+    - Exercise name
+    - Brief description
+    - Exercise animation (GIF)
+  </Step>
+
+  <Step title="Browse through pages">
+    Use the pagination controls at the bottom of the page to browse through the complete exercise library. Each page displays 9 exercises in a responsive grid layout (3 columns on large screens, 2 on medium, 1 on mobile).
+  </Step>
+</Steps>
+
+## Filter by Body Part
+
+Target exercises for specific areas of your body:
+
+<Steps>
+  <Step title="Open Body Parts filter">
+    From the **Exercises** dropdown menu in the navigation bar, select **Body Parts**, or navigate to `/body-parts`.
+  </Step>
+
+  <Step title="Select a body part">
+    Browse through available body part categories displayed as interactive cards with images:
+    - Chest
+    - Back
+    - Shoulders
+    - Arms
+    - Legs
+    - Core
+    - And more...
+
+    Click on any body part card to view all exercises targeting that area.
+  </Step>
+
+  <Step title="View filtered exercises">
+    You'll be taken to `/body-parts/[body-part]` showing only exercises for your selected body part. Each exercise displays with its animation and description.
+  </Step>
+</Steps>
+
+<Tip>
+  Body part filtering is perfect for creating balanced workouts or focusing on specific areas that need attention.
+</Tip>
+
+## Filter by Equipment
+
+Find exercises based on the equipment you have available:
+
+<Steps>
+  <Step title="Access Equipment filter">
+    From the **Exercises** menu, select **Equipment**, or go to `/equipments`.
+  </Step>
+
+  <Step title="Choose your equipment">
+    Browse through equipment categories displayed as visual cards:
+    - Barbell
+    - Dumbbell
+    - Cable
+    - Bodyweight
+    - Resistance bands
+    - Machines
+    - And more...
+  </Step>
+
+  <Step title="View equipment-specific exercises">
+    Click on an equipment type to navigate to `/equipments/[equipment]` and see all exercises using that equipment.
+  </Step>
+</Steps>
+
+<Note>
+  This is especially useful when working out at home with limited equipment or when you want to focus on a specific training style.
+</Note>
+
+## Filter by Target Muscle
+
+For precise muscle targeting:
+
+<Steps>
+  <Step title="Navigate to Target Muscles">
+    From the **Exercises** dropdown, select **Target Muscles**, or visit `/target-muscles`.
+  </Step>
+
+  <Step title="Select a muscle group">
+    View all available target muscle categories displayed in a responsive grid (up to 3 columns on large screens):
+    - Biceps
+    - Triceps
+    - Quadriceps
+    - Hamstrings
+    - Glutes
+    - Deltoids
+    - Latissimus dorsi
+    - And more specific muscle groups...
+  </Step>
+
+  <Step title="Browse muscle-specific exercises">
+    Click on a target muscle to navigate to `/target-muscles/[target-muscle]` and view all exercises that specifically target that muscle.
+  </Step>
+</Steps>
+
+<Tip>
+  Target muscle filtering is ideal for hypertrophy training or addressing muscle imbalances.
+</Tip>
+
+## Use Search
+
+Quickly find exercises by name:
+
+<Steps>
+  <Step title="Go to All Exercises page">
+    Navigate to `/exercises` to access the search functionality.
+  </Step>
+
+  <Step title="Enter search query">
+    At the top of the page, you'll find a search bar with placeholder text "Search by name".
+
+    Start typing the exercise name (e.g., "push up", "squat", "curl").
+  </Step>
+
+  <Step title="View search results">
+    The search uses debouncing (500ms delay) to provide smooth results as you type.
+
+    The page automatically updates to show exercises matching your search query. The URL will update to `/exercises?search=[your-query]`.
+  </Step>
+
+  <Step title="Clear search">
+    To return to browsing all exercises, simply clear the search field.
+  </Step>
+</Steps>
+
+<Note>
+  The search function is case-insensitive and searches through exercise names. Results appear automatically as you type, with a slight delay to prevent excessive filtering.
+</Note>
+
+## View Exercise Details
+
+Once you've found an exercise of interest:
+
+<Steps>
+  <Step title="Click on an exercise card">
+    From any exercise listing (search results, filtered view, or browse all), click on an exercise card.
+  </Step>
+
+  <Step title="View comprehensive details">
+    The exercise detail page (`/exercises/[exerciseId]`) displays:
+
+    **Header Section:**
+    - Exercise title
+    - Target muscle
+    - Body part
+    - Equipment needed
+    - Muscles worked
+    - Animated GIF demonstration
+
+    **Reference Images:**
+    - Multiple reference images in a carousel
+    - Swipe horizontally on desktop, vertically on mobile
+    - Use navigation arrows to browse images
+
+    **Reference Videos:**
+    - Embedded video tutorials (if available)
+    - YouTube videos displayed in a carousel format
+    - Full-screen viewing support
+
+    **Detailed Instructions:**
+    - Step-by-step exercise instructions
+    - Form tips and technique guidance
+    - Safety considerations
+    - Common mistakes to avoid
+  </Step>
+
+  <Step title="Use reference materials">
+    Study the GIF animation, reference images, and videos to understand proper form before attempting the exercise.
+  </Step>
+</Steps>
+
+<Tip>
+  Bookmark exercise detail pages for quick reference during your workouts. The page URLs are shareable, so you can easily save or share exercises with workout partners.
+</Tip>
+
+## Tips for Effective Exercise Discovery
+
+- **Combine filters mentally**: While browsing by body part, note the equipment needed to plan workouts based on available equipment
+- **Explore related exercises**: When viewing an exercise detail page, the header shows the body part, target muscle, and equipment - click these to find similar exercises
+- **Use pagination**: Don't forget to browse through multiple pages when searching broadly - there may be variations of exercises you're interested in
+- **Responsive design**: The exercise library adapts to your screen size, showing 3 columns on large screens, 2 on tablets, and 1 on mobile devices for optimal viewing
+
+## Next Steps
+
+Now that you know how to find exercises:
+
+- Explore [Workout Routines](/guides/workout-routines) to see how exercises are combined into complete programs
+- Learn about [Customization](/guides/customization) options to personalize your BodyWorks experience
+- Start building your own workout plan using the exercises you've discovered

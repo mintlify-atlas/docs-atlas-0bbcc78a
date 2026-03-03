@@ -1,0 +1,321 @@
+---
+title: Workout Routines
+description: Discover and navigate pre-built workout routines for all fitness levels and goals
+---
+
+BodyWorks provides a comprehensive library of pre-built workout routines designed by fitness professionals. Whether you're a beginner just starting your fitness journey or an advanced athlete looking for new challenges, this guide will help you navigate and understand the routine system.
+
+## Browse All Routines
+
+<Steps>
+  <Step title="Navigate to Routines">
+    From the main navigation bar, hover over **Routines** and select **Browse Routines**, or visit `/routines` directly.
+  </Step>
+
+  <Step title="View routine cards">
+    Browse through paginated routine cards (9 per page) displayed in a responsive grid:
+    - **Routine title**: Clear, descriptive name
+    - **Routine description**: Brief overview of the routine's focus and benefits
+    - **Featured image**: Visual representation of the routine
+
+    Each card has an interactive 3D effect that responds to your mouse movement on desktop.
+  </Step>
+
+  <Step title="Navigate pages">
+    Use the pagination controls at the bottom to browse through all available routines. The pagination shows your current page and total pages available.
+  </Step>
+</Steps>
+
+<Tip>
+  Routine cards have a hover effect that lifts them up and adds a shadow - this makes browsing more engaging and helps you focus on one routine at a time.
+</Tip>
+
+## Browse Routine Categories
+
+Find routines organized by training style and goals:
+
+<Steps>
+  <Step title="Access Routine Categories">
+    From the **Routines** dropdown menu, select **Routine Categories**, or navigate to `/routine-category`.
+  </Step>
+
+  <Step title="Explore categories">
+    View all available routine categories displayed as interactive cards with descriptive images. Categories may include:
+    - Strength Training
+    - Hypertrophy (Muscle Building)
+    - Endurance
+    - Power Training
+    - Functional Fitness
+    - Athletic Performance
+    - General Fitness
+    - And more...
+  </Step>
+
+  <Step title="Select a category">
+    Click on any category card to view all routines within that category. You'll be directed to `/routines?category=[category-name]` showing filtered results.
+  </Step>
+</Steps>
+
+<Note>
+  Categories help you quickly find routines aligned with your training goals without browsing through unrelated programs.
+</Note>
+
+## Find Routines by Fitness Level
+
+Routines in BodyWorks are designed for different experience levels:
+
+### Beginner Routines
+
+**Characteristics:**
+- Lower training volume
+- Fundamental movement patterns
+- Emphasis on form and technique
+- Full-body or simple split routines
+- 2-4 training days per week
+- Longer rest periods
+
+**Look for indicators:**
+- Routine titles with "Beginner", "Starter", or "Foundation"
+- Descriptions mentioning "new to fitness" or "getting started"
+- Categories focused on "General Fitness" or "Functional Fitness"
+
+### Intermediate Routines
+
+**Characteristics:**
+- Moderate to high training volume
+- More exercise variety
+- Upper/lower or push/pull/legs splits
+- 3-5 training days per week
+- Progressive overload principles
+
+**Look for indicators:**
+- Titles with "Intermediate", "Progressive", or "Advancing"
+- Descriptions mentioning "building on basics" or "increased intensity"
+- More complex training splits in workout summaries
+
+### Advanced Routines
+
+**Characteristics:**
+- High training volume
+- Specialized techniques (supersets, drop sets, etc.)
+- Body part splits or specialized programs
+- 4-6+ training days per week
+- Periodization and advanced programming
+
+**Look for indicators:**
+- Titles with "Advanced", "Elite", or "Competition"
+- Descriptions mentioning "experienced lifters" or "peak performance"
+- Categories like "Power Training" or "Athletic Performance"
+
+<Tip>
+  Always choose a routine that matches your current fitness level. Starting with an advanced routine when you're a beginner increases injury risk and can lead to burnout.
+</Tip>
+
+## Find Routines by Training Goal
+
+Routines are categorized by specific fitness objectives:
+
+### Strength Development
+
+**Focus:** Maximum force production and neural adaptations
+
+**Characteristics:**
+- Lower rep ranges (1-6 reps)
+- Compound movements (squats, deadlifts, bench press)
+- Longer rest periods (3-5 minutes)
+- Focus on progressive overload
+
+**How to find:**
+- Look for "Strength" or "Power" in category names
+- Check routine descriptions for mentions of "max strength" or "powerlifting"
+
+### Hypertrophy (Muscle Building)
+
+**Focus:** Muscle size and volume
+
+**Characteristics:**
+- Moderate rep ranges (6-12 reps)
+- Mix of compound and isolation exercises
+- Moderate rest periods (60-90 seconds)
+- Higher training volume
+
+**How to find:**
+- Browse the "Hypertrophy" category
+- Look for descriptions mentioning "muscle building", "mass gain", or "size"
+
+### Endurance & Conditioning
+
+**Focus:** Cardiovascular fitness and muscular endurance
+
+**Characteristics:**
+- Higher rep ranges (15+ reps)
+- Circuit-style training
+- Shorter rest periods
+- Metabolic conditioning
+
+**How to find:**
+- Check "Endurance" or "Conditioning" categories
+- Look for mentions of "cardio", "stamina", or "work capacity"
+
+### Athletic Performance
+
+**Focus:** Sport-specific training and functional movement
+
+**Characteristics:**
+- Explosive movements
+- Plyometrics and power development
+- Agility and mobility work
+- Sport-specific exercises
+
+**How to find:**
+- Browse "Athletic Performance" or "Functional Fitness" categories
+- Look for descriptions mentioning "explosiveness", "speed", or "agility"
+
+<Note>
+  Your training goal may change over time. Many athletes use periodization, cycling through different goals (strength, hypertrophy, endurance) throughout the year.
+</Note>
+
+## Understanding Routine Details
+
+When you click on a routine card, you'll see comprehensive information:
+
+<Steps>
+  <Step title="View routine header">
+    At the top of the routine detail page (`/routines/[routine-id]`), you'll find:
+    - **Routine title**: The program name
+    - **Description**: Overview of the routine's purpose and benefits
+    - **Featured image**: Visual representation
+    - **Categories**: Tags showing the routine's classification (clickable to find similar routines)
+  </Step>
+
+  <Step title="Review the Workout Summary">
+    The **Workout Summary** section displays a table with:
+    - Training days per week
+    - Session duration
+    - Required equipment
+    - Training split overview
+    - Target muscle groups per session
+    - Difficulty level
+
+    This gives you a quick overview to determine if the routine fits your schedule and equipment availability.
+  </Step>
+
+  <Step title="Examine the Workout Plan">
+    The **Workout Plan** section provides detailed day-by-day instructions:
+
+    **For each training day:**
+    - Day heading (e.g., "Day 1: Chest & Triceps")
+    - Complete exercise list with:
+      - Exercise names
+      - Sets and reps
+      - Rest periods
+      - Tempo or technique notes
+      - Exercise progression options
+
+    The workout plan uses markdown formatting for clear, readable instructions with:
+    - Bullet points for exercise lists
+    - Bold text for important notes
+    - Organized sections for warm-up, main work, and cool-down
+  </Step>
+
+  <Step title="Click category tags">
+    The category tags below the routine title are clickable links. Click any category to discover other routines in the same category.
+  </Step>
+</Steps>
+
+<Tip>
+  Save or bookmark routine URLs for easy access. You can return to specific routines anytime by visiting `/routines/[routine-id]`.
+</Tip>
+
+## Using Workout Summaries Effectively
+
+The workout summary table is your quick-reference guide:
+
+**Check before starting:**
+- **Time commitment**: Ensure you can dedicate the required time per session
+- **Weekly frequency**: Verify the routine fits your schedule (2-6 days per week)
+- **Equipment needs**: Confirm you have access to required equipment
+- **Recovery demands**: Advanced routines may require more recovery between sessions
+
+**During your program:**
+- Reference the summary to stay on track with the intended training split
+- Use it to plan your weekly schedule
+- Track your adherence to the prescribed frequency
+
+<Note>
+  The workout summary helps you quickly compare routines. If you're short on time, look for routines with shorter session durations or fewer training days per week.
+</Note>
+
+## Understanding Workout Plans
+
+Workout plans provide the detailed roadmap:
+
+### Reading Workout Plans
+
+**Typical format:**
+```
+Day 1: Upper Body Push
+
+Warm-up:
+- 5 minutes cardio
+- Dynamic stretching
+
+Main Workout:
+1. Barbell Bench Press - 4 sets x 8 reps (3-0-1-0 tempo)
+2. Overhead Press - 3 sets x 10 reps
+3. Incline Dumbbell Press - 3 sets x 12 reps
+4. Tricep Dips - 3 sets x 15 reps
+5. Cable Flyes - 3 sets x 15 reps
+
+Cool-down:
+- Static stretching (5 minutes)
+```
+
+### Following the Plan
+
+<Steps>
+  <Step title="Read through completely">
+    Before starting, read the entire workout plan to understand the full program structure and weekly split.
+  </Step>
+
+  <Step title="Prepare for each session">
+    Before each workout:
+    - Review that day's exercises
+    - Ensure equipment is available
+    - Understand any special techniques or tempo prescriptions
+  </Step>
+
+  <Step title="Follow the order">
+    Exercises are listed in the intended order:
+    - Compound movements typically come first
+    - Isolation exercises follow
+    - This order optimizes performance and safety
+  </Step>
+
+  <Step title="Track your progress">
+    Keep a workout log to record:
+    - Weights used
+    - Reps completed
+    - How you felt
+    - Modifications made
+  </Step>
+</Steps>
+
+<Tip>
+  If an exercise in the plan is unfamiliar, click on the exercise name (if linked) or search for it in the exercise database to view proper form and technique before attempting it.
+</Tip>
+
+## Tips for Choosing the Right Routine
+
+1. **Match your experience level**: Don't jump into advanced programs too soon
+2. **Align with your goals**: Choose routines designed for your primary objective
+3. **Consider your schedule**: Be realistic about training frequency you can maintain
+4. **Check equipment requirements**: Ensure you have access to necessary equipment
+5. **Review the volume**: Make sure the total training volume is appropriate for your recovery capacity
+6. **Read the full plan**: Don't just look at Day 1 - understand the complete weekly structure
+
+## Next Steps
+
+- Explore the [Finding Exercises](/guides/finding-exercises) guide to learn about individual exercises used in routines
+- Learn about [Customization](/guides/customization) options to personalize your experience
+- Start your first routine and track your progress over the recommended program duration (usually 4-12 weeks)

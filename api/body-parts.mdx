@@ -1,0 +1,179 @@
+---
+title: 'Get Body Parts'
+api: 'GET /bodyParts'
+description: 'Retrieve a list of body parts used for exercise categorization'
+---
+
+## Endpoint
+
+```
+GET /api/bodyParts
+```
+
+Retrieve a list of body parts available in the BodyWorks database. Body parts are used to categorize exercises and help users find exercises targeting specific areas of the body.
+
+## Query Parameters
+
+<ParamField query="limit" type="number" optional>
+  The maximum number of body parts to return. If not specified, returns all available body parts.
+</ParamField>
+
+## Response
+
+<ResponseField name="totalBodyParts" type="number">
+  The total number of body parts available in the database.
+</ResponseField>
+
+<ResponseField name="data" type="IBodyPart[]">
+  An array of body part objects.
+  
+  <Expandable title="Body Part Object">
+    <ResponseField name="bodyPart" type="string">
+      The name of the body part (e.g., "chest", "back", "legs", "shoulders").
+    </ResponseField>
+    
+    <ResponseField name="imageUrl" type="string">
+      URL to an image representing this body part.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    # Get all body parts
+    curl -X GET "https://api.bodyworks.com/api/bodyParts"
+
+    # Get limited number of body parts
+    curl -X GET "https://api.bodyworks.com/api/bodyParts?limit=5"
+    ```
+  </Tab>
+  
+  <Tab title="axios">
+    ```javascript
+    import axios from 'axios';
+
+    const getBodyParts = async (limit) => {
+      const response = await axios.get('/api/bodyParts', {
+        params: {
+          limit
+        }
+      });
+      return response.data;
+    };
+
+    // Get all body parts
+    const allBodyParts = await getBodyParts();
+
+    // Get limited body parts
+    const limitedBodyParts = await getBodyParts(5);
+    ```
+  </Tab>
+  
+  <Tab title="fetch">
+    ```javascript
+    const getBodyParts = async (limit) => {
+      const url = limit 
+        ? `/api/bodyParts?limit=${limit}`
+        : '/api/bodyParts';
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      return data;
+    };
+
+    // Get all body parts
+    const allBodyParts = await getBodyParts();
+
+    // Get limited body parts
+    const limitedBodyParts = await getBodyParts(5);
+    ```
+  </Tab>
+</Tabs>
+
+## Example Response
+
+```json
+{
+  "totalBodyParts": 12,
+  "data": [
+    {
+      "bodyPart": "chest",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/chest.png"
+    },
+    {
+      "bodyPart": "back",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/back.png"
+    },
+    {
+      "bodyPart": "legs",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/legs.png"
+    },
+    {
+      "bodyPart": "shoulders",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/shoulders.png"
+    },
+    {
+      "bodyPart": "arms",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/arms.png"
+    },
+    {
+      "bodyPart": "core",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/core.png"
+    },
+    {
+      "bodyPart": "glutes",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/glutes.png"
+    },
+    {
+      "bodyPart": "calves",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/calves.png"
+    },
+    {
+      "bodyPart": "forearms",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/forearms.png"
+    },
+    {
+      "bodyPart": "neck",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/neck.png"
+    },
+    {
+      "bodyPart": "cardio",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/cardio.png"
+    },
+    {
+      "bodyPart": "full body",
+      "imageUrl": "https://cdn.bodyworks.com/bodyparts/full-body.png"
+    }
+  ]
+}
+```
+
+## Error Responses
+
+<ResponseField name="400 Bad Request">
+  ```json
+  {
+    "error": "Invalid limit parameter",
+    "message": "Limit must be a positive integer"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error">
+  ```json
+  {
+    "error": "Internal server error",
+    "message": "Failed to fetch body parts from database"
+  }
+  ```
+</ResponseField>
+
+## Use Cases
+
+- **Exercise Filtering**: Use body parts to filter exercises by target area
+- **Navigation**: Display body part categories for easy browsing
+- **Workout Planning**: Select body parts to focus on for specific training days
+- **User Interface**: Populate dropdowns and filters in your application

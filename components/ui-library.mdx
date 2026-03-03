@@ -1,0 +1,743 @@
+---
+title: "UI Library"
+description: "Comprehensive guide to Shadcn UI, custom components, and Aceternity UI components"
+---
+
+## Shadcn UI Components
+
+BodyWorks uses Shadcn UI components configured with the New York style. All UI components are located in `components/ui/`.
+
+### Form Components
+
+#### Button
+
+A versatile button component with multiple variants and sizes.
+
+<Tabs>
+  <Tab title="Usage">
+    ```tsx
+    import { Button } from "@/components/ui/button";
+
+    <Button variant="default" size="default">
+      Click me
+    </Button>
+
+    <Button variant="destructive" size="lg">
+      Delete
+    </Button>
+
+    <Button variant="outline" size="sm">
+      Cancel
+    </Button>
+
+    <Button variant="ghost" size="icon">
+      <Icon />
+    </Button>
+    ```
+  </Tab>
+
+  <Tab title="Props">
+    | Prop | Type | Default | Description |
+    |------|------|---------|-------------|
+    | `variant` | `'default' \| 'destructive' \| 'outline' \| 'secondary' \| 'ghost' \| 'link'` | `'default'` | Visual variant |
+    | `size` | `'default' \| 'sm' \| 'lg' \| 'icon'` | `'default'` | Button size |
+    | `asChild` | `boolean` | `false` | Render as child element using Slot |
+  </Tab>
+
+  <Tab title="Source">
+    ```tsx
+    // components/ui/button.tsx
+    const buttonVariants = cva(
+      "inline-flex items-center justify-center...",
+      {
+        variants: {
+          variant: {
+            default: "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
+            destructive: "bg-destructive text-white shadow-xs hover:bg-destructive/90",
+            outline: "border bg-background shadow-xs hover:bg-accent",
+            secondary: "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
+            ghost: "hover:bg-accent hover:text-accent-foreground",
+            link: "text-primary underline-offset-4 hover:underline",
+          },
+          size: {
+            default: "h-9 px-4 py-2",
+            sm: "h-8 rounded-md gap-1.5 px-3",
+            lg: "h-10 rounded-md px-6",
+            icon: "size-9",
+          },
+        },
+      }
+    );
+    ```
+  </Tab>
+</Tabs>
+
+#### Input
+
+A styled input component with form validation support.
+
+```tsx
+import { Input } from "@/components/ui/input";
+
+<Input 
+  type="text" 
+  placeholder="Enter text"
+  className="max-w-lg"
+/>
+
+// With validation
+<Input 
+  type="email" 
+  placeholder="email@example.com"
+  aria-invalid={hasError}
+/>
+```
+
+**Props:**
+- Extends all native `<input>` attributes
+- Automatic focus ring styling
+- Validation state support via `aria-invalid`
+- File upload styling included
+
+### Navigation Components
+
+#### Navigation Menu
+
+A full-featured navigation menu with nested items and keyboard support.
+
+```tsx
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink,
+} from "@/components/ui/navigation-menu";
+
+<NavigationMenu>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger>Exercises</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <NavigationMenuLink href="/exercises">
+          All Exercises
+        </NavigationMenuLink>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>
+```
+
+#### Dropdown Menu
+
+A dropdown menu component with rich functionality.
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline">Open Menu</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuItem>Profile</DropdownMenuItem>
+    <DropdownMenuItem>Settings</DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>Logout</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+### Layout Components
+
+#### Drawer
+
+A mobile-friendly drawer component for side navigation.
+
+```tsx
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from "@/components/ui/drawer";
+
+<Drawer>
+  <DrawerTrigger asChild>
+    <Button>Open Drawer</Button>
+  </DrawerTrigger>
+  <DrawerContent>
+    <DrawerHeader>
+      <DrawerTitle>Navigation</DrawerTitle>
+    </DrawerHeader>
+    {/* Content */}
+  </DrawerContent>
+</Drawer>
+```
+
+#### Accordion
+
+Collapsible content sections.
+
+```tsx
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Exercise Details</AccordionTrigger>
+    <AccordionContent>
+      Detailed exercise information...
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+#### Carousel
+
+A responsive carousel component for image galleries.
+
+```tsx
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+
+<Carousel>
+  <CarouselContent>
+    <CarouselItem>Slide 1</CarouselItem>
+    <CarouselItem>Slide 2</CarouselItem>
+    <CarouselItem>Slide 3</CarouselItem>
+  </CarouselContent>
+  <CarouselPrevious />
+  <CarouselNext />
+</Carousel>
+```
+
+### Feedback Components
+
+#### Tooltip
+
+Contextual information on hover.
+
+```tsx
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
+
+<TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger>Hover me</TooltipTrigger>
+    <TooltipContent>
+      <p>Helpful information</p>
+    </TooltipContent>
+  </Tooltip>
+</TooltipProvider>
+```
+
+#### Sonner (Toast)
+
+Toast notifications for user feedback.
+
+```tsx
+import { toast } from "sonner";
+
+toast.success("Exercise saved!");
+toast.error("Failed to load data");
+toast.info("New routine available");
+
+toast.error("Exercise ID is required", {
+  description: "Please provide an exercise ID",
+});
+```
+
+#### Skeleton
+
+Loading placeholders for content.
+
+```tsx
+import { Skeleton } from "@/components/ui/skeleton";
+
+<Skeleton className="h-12 w-12 rounded-full" />
+<Skeleton className="h-4 w-[250px]" />
+<Skeleton className="h-4 w-[200px]" />
+```
+
+#### Pagination
+
+Pagination controls for list views.
+
+```tsx
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+<Pagination>
+  <PaginationContent>
+    <PaginationItem>
+      <PaginationPrevious href="?page=1" />
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="?page=2">2</PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationNext href="?page=3" />
+    </PaginationItem>
+  </PaginationContent>
+</Pagination>
+```
+
+## Custom Components
+
+Fitness-specific components built for BodyWorks.
+
+### Exercise Card
+
+Displays exercise information with 3D animation effects.
+
+<Tabs>
+  <Tab title="Usage">
+    ```tsx
+    import { Card } from "@/components/exercise-card";
+
+    <Card
+      name="Push-ups"
+      image="/exercises/pushups.jpg"
+      path="exercises"
+      searchName="pushups"
+    />
+    ```
+  </Tab>
+
+  <Tab title="Props">
+    | Prop | Type | Required | Description |
+    |------|------|----------|-------------|
+    | `name` | `string` | Yes | Exercise name |
+    | `image` | `string` | Yes | Image URL |
+    | `path` | `string` | Yes | Base path for link |
+    | `searchName` | `string` | No | Custom name for URL |
+  </Tab>
+
+  <Tab title="Implementation">
+    ```tsx
+    // components/exercise-card.tsx
+    export const Card = ({ name, image, path, searchName }: ICardProps) => {
+      return (
+        <Link href={`/${path}/${searchName ? searchName : name}`}>
+          <div className={"transition-all duration-200 hover:scale-110"}>
+            <CardContainer className="xs:max-w-62 sm:max-w-80 lg:max-w-68">
+              <CardBody className="group/card relative h-fit mt-10 rounded-xl border bg-gray-50 p-6 shadow-lg shadow-amber-900 dark:bg-black dark:shadow-pink-500">
+                <CardItem
+                  translateZ="100"
+                  rotateX={20}
+                  rotateZ={-10}
+                  className="mt-4 w-full"
+                >
+                  <Image
+                    src={image}
+                    className="h-60 w-full rounded-xl object-cover"
+                    width={1000}
+                    height={1000}
+                    alt={"photo"}
+                  />
+                </CardItem>
+                <CardItem className="text-xl mt-5 font-bold">
+                  <p className="text-center">{name}</p>
+                </CardItem>
+              </CardBody>
+            </CardContainer>
+          </div>
+        </Link>
+      );
+    };
+    ```
+  </Tab>
+</Tabs>
+
+### Routine Card
+
+Displays workout routine information with title, description, and image.
+
+```tsx
+import RoutineCard from "@/components/routine-card";
+
+<RoutineCard
+  routine_title="Full Body Workout"
+  routine_description="A comprehensive full-body training program"
+  routine_imageUrl="/routines/fullbody.jpg"
+/>
+```
+
+**Source (components/routine-card.tsx:10-48):**
+```tsx
+const RoutineCard = ({
+  routine_title,
+  routine_description,
+  routine_imageUrl,
+}: IRoutineCardProps) => {
+  return (
+    <CardContainer className="font-poppins">
+      <CardBody className="group/card relative mx-12 mt-10 h-auto max-w-80 rounded-xl border bg-gray-50 p-6 shadow-lg dark:bg-black">
+        <CardItem translateZ="50" className="text-xl font-bold">
+          {routine_title}
+        </CardItem>
+        <CardItem as="p" translateZ="60" className="mt-2 text-sm text-neutral-500">
+          {routine_description}
+        </CardItem>
+        <CardItem translateZ="100" rotateX={20} rotateZ={-10} className="mt-4 w-full">
+          <Image
+            src={routine_imageUrl}
+            height="1000"
+            width="1000"
+            className="h-60 w-full rounded-xl object-cover"
+            alt="thumbnail"
+          />
+        </CardItem>
+      </CardBody>
+    </CardContainer>
+  );
+};
+```
+
+### Descripted Card
+
+Exercise card with description preview.
+
+```tsx
+import { DescriptedCard } from "@/components/descripted-card";
+
+<DescriptedCard
+  id="123"
+  title="Bench Press"
+  gif="/exercises/bench-press.gif"
+  blog="Description: The bench press is a compound exercise..."
+/>
+```
+
+### Search Bar
+
+Debounced search input component.
+
+<Tabs>
+  <Tab title="Usage">
+    ```tsx
+    import { SearchBar } from "@/components/search-bar";
+
+    function ExerciseList() {
+      const [query, setQuery] = useState("");
+
+      return (
+        <SearchBar getQuery={setQuery} />
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Features">
+    - 500ms debounce delay
+    - Responsive styling
+    - Memoized for performance
+    - Placeholder text: "Search by name"
+  </Tab>
+
+  <Tab title="Implementation">
+    ```tsx
+    // components/search-bar.tsx
+    export const SearchBar = memo(
+      ({ getQuery }: { getQuery: (query: string) => void }) => {
+        const [searchQuery, setSearchQuery] = useState<string>("");
+        const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+        useEffect(() => {
+          if (getQuery) {
+            getQuery(debouncedSearchQuery);
+          }
+        }, [debouncedSearchQuery]);
+
+        return (
+          <Input
+            placeholder="Search by name"
+            className="max-w-lg mx-auto"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        );
+      }
+    );
+    ```
+  </Tab>
+</Tabs>
+
+## Aceternity UI Components
+
+Advanced animated components from Aceternity UI.
+
+### 3D Card
+
+Interactive 3D card with tilt effect on mouse movement.
+
+<Tabs>
+  <Tab title="Usage">
+    ```tsx
+    import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
+
+    <CardContainer>
+      <CardBody className="bg-gray-50 p-6 rounded-xl">
+        <CardItem translateZ="50" className="text-xl font-bold">
+          Title
+        </CardItem>
+        <CardItem translateZ="100" rotateX={20} rotateZ={-10}>
+          <img src="/image.jpg" alt="Image" />
+        </CardItem>
+      </CardBody>
+    </CardContainer>
+    ```
+  </Tab>
+
+  <Tab title="CardItem Props">
+    | Prop | Type | Default | Description |
+    |------|------|---------|-------------|
+    | `translateX` | `number \| string` | `0` | X-axis translation |
+    | `translateY` | `number \| string` | `0` | Y-axis translation |
+    | `translateZ` | `number \| string` | `0` | Z-axis translation (depth) |
+    | `rotateX` | `number \| string` | `0` | X-axis rotation |
+    | `rotateY` | `number \| string` | `0` | Y-axis rotation |
+    | `rotateZ` | `number \| string` | `0` | Z-axis rotation |
+    | `as` | `React.ElementType` | `'div'` | Element type to render |
+  </Tab>
+
+  <Tab title="How It Works">
+    The 3D card uses CSS transforms and mouse tracking:
+
+    ```tsx
+    // Mouse movement calculation
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+      const { left, top, width, height } = containerRef.current.getBoundingClientRect();
+      const x = (e.clientX - left - width / 2) / 25;
+      const y = (e.clientY - top - height / 2) / 25;
+      containerRef.current.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+    };
+    ```
+
+    - Perspective: `1000px`
+    - Transform style: `preserve-3d`
+    - Smooth transitions on mouse enter/leave
+  </Tab>
+</Tabs>
+
+### Floating Dock
+
+MacOS-style animated dock for navigation.
+
+<Tabs>
+  <Tab title="Usage">
+    ```tsx
+    import { FloatingDock } from "@/components/ui/floating-dock";
+    import { Home, Dumbbell, Calendar } from "lucide-react";
+
+    const navItems = [
+      { title: "Home", icon: <Home />, href: "/" },
+      { title: "Exercises", icon: <Dumbbell />, href: "/exercises" },
+      { title: "Routines", icon: <Calendar />, href: "/routines" },
+    ];
+
+    <FloatingDock items={navItems} />
+    ```
+  </Tab>
+
+  <Tab title="Props">
+    | Prop | Type | Description |
+    |------|------|-------------|
+    | `items` | `Array<{title: string, icon: ReactNode, href: string}>` | Navigation items |
+    | `desktopClassName` | `string` | Custom classes for desktop view |
+    | `mobileClassName` | `string` | Custom classes for mobile view |
+  </Tab>
+
+  <Tab title="Features">
+    - **Desktop**: Magnification effect on hover
+    - **Mobile**: Drawer-based navigation
+    - Responsive breakpoint: `md:` (768px)
+    - Smooth spring animations using Framer Motion
+    - Tooltip on hover (desktop)
+
+    ```tsx
+    // Magnification transform
+    const widthTransform = useTransform(
+      distance, 
+      [-150, 0, 150], 
+      [40, 80, 40]
+    );
+    ```
+  </Tab>
+</Tabs>
+
+### Infinite Moving Cards
+
+Auto-scrolling card carousel for testimonials.
+
+<Tabs>
+  <Tab title="Usage">
+    ```tsx
+    import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
+
+    const testimonials = [
+      {
+        quote: "This app transformed my fitness journey!",
+        name: "John Doe",
+        title: "Fitness Enthusiast"
+      },
+      // More testimonials...
+    ];
+
+    <InfiniteMovingCards
+      items={testimonials}
+      direction="left"
+      speed="fast"
+      pauseOnHover={true}
+    />
+    ```
+  </Tab>
+
+  <Tab title="Props">
+    | Prop | Type | Default | Description |
+    |------|------|---------|-------------|
+    | `items` | `Array<{quote, name, title}>` | Required | Testimonial data |
+    | `direction` | `'left' \| 'right'` | `'left'` | Scroll direction |
+    | `speed` | `'fast' \| 'normal' \| 'slow'` | `'fast'` | Animation speed |
+    | `pauseOnHover` | `boolean` | `true` | Pause on mouse hover |
+  </Tab>
+
+  <Tab title="Speed Values">
+    ```tsx
+    // Animation durations
+    fast   → 20s
+    normal → 40s
+    slow   → 80s
+    ```
+  </Tab>
+</Tabs>
+
+### Box Reveal
+
+Text reveal animation component.
+
+```tsx
+import BoxReveal from "@/components/ui/box-reveal";
+
+<BoxReveal>
+  <h1>Welcome to BodyWorks</h1>
+</BoxReveal>
+```
+
+## Component Examples
+
+Real-world usage examples from BodyWorks.
+
+### Exercise Grid Layout
+
+```tsx
+import { Card } from "@/components/exercise-card";
+import useExercises from "@/hooks/useExercises";
+
+function ExerciseGrid() {
+  const { exercises, isLoading } = useExercises(9, 1);
+
+  if (isLoading) return <Skeleton className="h-64 w-full" />;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {exercises?.data.map((exercise) => (
+        <Card
+          key={exercise.id}
+          name={exercise.name}
+          image={exercise.gifUrl}
+          path="exercises"
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+### Routine Showcase
+
+```tsx
+import RoutineCard from "@/components/routine-card";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+
+function RoutineShowcase({ routines }) {
+  return (
+    <Carousel>
+      <CarouselContent>
+        {routines.map((routine) => (
+          <CarouselItem key={routine.id}>
+            <RoutineCard
+              routine_title={routine.title}
+              routine_description={routine.description}
+              routine_imageUrl={routine.imageUrl}
+            />
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+    </Carousel>
+  );
+}
+```
+
+## Theming
+
+All components support dark mode via the theme provider.
+
+```tsx
+import { ThemeProvider } from "@/components/theme-provider";
+import { ModeToggle } from "@/components/mode-toggle";
+
+function App({ children }) {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system">
+      {children}
+      <ModeToggle />
+    </ThemeProvider>
+  );
+}
+```
+
+<Note>
+  All components automatically adapt to the current theme using CSS variables and the `dark:` prefix.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="React Hooks" icon="link" href="/components/hooks">
+    Learn about data fetching and utility hooks
+  </Card>
+
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Explore the backend API endpoints
+  </Card>
+</CardGroup>

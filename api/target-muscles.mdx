@@ -1,0 +1,213 @@
+---
+title: 'Get Target Muscles'
+api: 'GET /targetMuscles'
+description: 'Retrieve a list of target muscles for exercise classification'
+---
+
+## Endpoint
+
+```
+GET /api/targetMuscles
+```
+
+Retrieve a list of target muscles available in the BodyWorks database. Target muscles represent the primary muscles worked during exercises and are used for detailed exercise categorization.
+
+## Query Parameters
+
+<ParamField query="limit" type="number" optional>
+  The maximum number of target muscles to return. If not specified, returns all available target muscles.
+</ParamField>
+
+## Response
+
+<ResponseField name="totalTargetMuscles" type="number">
+  The total number of target muscles available in the database.
+</ResponseField>
+
+<ResponseField name="data" type="ITargetMuscle[]">
+  An array of target muscle objects.
+  
+  <Expandable title="Target Muscle Object">
+    <ResponseField name="targetMuscle" type="string">
+      The name of the target muscle (e.g., "pectorals", "quadriceps", "biceps", "deltoids").
+    </ResponseField>
+    
+    <ResponseField name="imageUrl" type="string">
+      URL to an anatomical image highlighting this target muscle.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    # Get all target muscles
+    curl -X GET "https://api.bodyworks.com/api/targetMuscles"
+
+    # Get limited number of target muscles
+    curl -X GET "https://api.bodyworks.com/api/targetMuscles?limit=10"
+    ```
+  </Tab>
+  
+  <Tab title="axios">
+    ```javascript
+    import axios from 'axios';
+
+    const getTargetMuscles = async (limit) => {
+      const response = await axios.get('/api/targetMuscles', {
+        params: {
+          limit
+        }
+      });
+      return response.data;
+    };
+
+    // Get all target muscles
+    const allTargetMuscles = await getTargetMuscles();
+
+    // Get limited target muscles
+    const limitedTargetMuscles = await getTargetMuscles(10);
+    ```
+  </Tab>
+  
+  <Tab title="fetch">
+    ```javascript
+    const getTargetMuscles = async (limit) => {
+      const url = limit 
+        ? `/api/targetMuscles?limit=${limit}`
+        : '/api/targetMuscles';
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      return data;
+    };
+
+    // Get all target muscles
+    const allTargetMuscles = await getTargetMuscles();
+
+    // Get limited target muscles
+    const limitedTargetMuscles = await getTargetMuscles(10);
+    ```
+  </Tab>
+</Tabs>
+
+## Example Response
+
+```json
+{
+  "totalTargetMuscles": 24,
+  "data": [
+    {
+      "targetMuscle": "pectorals",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/pectorals.png"
+    },
+    {
+      "targetMuscle": "latissimus dorsi",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/lats.png"
+    },
+    {
+      "targetMuscle": "quadriceps",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/quadriceps.png"
+    },
+    {
+      "targetMuscle": "hamstrings",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/hamstrings.png"
+    },
+    {
+      "targetMuscle": "deltoids",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/deltoids.png"
+    },
+    {
+      "targetMuscle": "biceps",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/biceps.png"
+    },
+    {
+      "targetMuscle": "triceps",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/triceps.png"
+    },
+    {
+      "targetMuscle": "glutes",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/glutes.png"
+    },
+    {
+      "targetMuscle": "calves",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/calves.png"
+    },
+    {
+      "targetMuscle": "abs",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/abs.png"
+    },
+    {
+      "targetMuscle": "obliques",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/obliques.png"
+    },
+    {
+      "targetMuscle": "trapezius",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/trapezius.png"
+    },
+    {
+      "targetMuscle": "rhomboids",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/rhomboids.png"
+    },
+    {
+      "targetMuscle": "erector spinae",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/erector-spinae.png"
+    },
+    {
+      "targetMuscle": "hip flexors",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/hip-flexors.png"
+    },
+    {
+      "targetMuscle": "adductors",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/adductors.png"
+    },
+    {
+      "targetMuscle": "abductors",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/abductors.png"
+    },
+    {
+      "targetMuscle": "forearms",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/forearms.png"
+    },
+    {
+      "targetMuscle": "serratus anterior",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/serratus.png"
+    },
+    {
+      "targetMuscle": "rotator cuff",
+      "imageUrl": "https://cdn.bodyworks.com/muscles/rotator-cuff.png"
+    }
+  ]
+}
+```
+
+## Error Responses
+
+<ResponseField name="400 Bad Request">
+  ```json
+  {
+    "error": "Invalid limit parameter",
+    "message": "Limit must be a positive integer"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error">
+  ```json
+  {
+    "error": "Internal server error",
+    "message": "Failed to fetch target muscles from database"
+  }
+  ```
+</ResponseField>
+
+## Use Cases
+
+- **Precise Exercise Filtering**: Filter exercises by specific target muscles
+- **Muscle Group Training**: Find exercises targeting specific muscles for balanced development
+- **Injury Prevention**: Identify exercises that work specific muscles while avoiding others
+- **Progressive Overload**: Track exercises targeting the same muscle groups over time
+- **Anatomical Education**: Display muscle anatomy to help users understand exercise mechanics
+- **Workout Balance**: Ensure workout routines target all major muscle groups appropriately

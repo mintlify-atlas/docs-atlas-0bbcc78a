@@ -1,0 +1,211 @@
+---
+title: Exercise database
+description: Explore 1300+ exercises with detailed instructions, images, and videos
+---
+
+## Overview
+
+BodyWorks features a comprehensive database of over **1300 exercises** covering all major muscle groups and fitness goals. Each exercise includes detailed information, visual demonstrations, and step-by-step instructions to help you perform movements safely and effectively.
+
+<CardGroup cols={2}>
+  <Card title="1300+ exercises" icon="dumbbell">
+    Complete library covering strength, cardio, flexibility, and more
+  </Card>
+  <Card title="Rich media content" icon="photo-film">
+    Animated GIFs, reference images, and instructional videos
+  </Card>
+  <Card title="Detailed metadata" icon="list">
+    Target muscles, body parts, equipment, and keywords for each exercise
+  </Card>
+  <Card title="Search and filter" icon="magnifying-glass">
+    Find exercises by name, equipment, body part, or target muscle
+  </Card>
+</CardGroup>
+
+## Exercise information
+
+Each exercise in the database includes comprehensive details to help you understand and perform the movement correctly.
+
+### Data structure
+
+Every exercise contains the following information:
+
+```typescript types.d.ts
+interface IExercise {
+  name: string;              // Exercise identifier
+  title: string;             // Display name
+  target: string;            // Primary target muscle
+  muscles_worked: string;    // All muscles engaged
+  bodyPart: string;          // Main body part trained
+  equipment: string;         // Required equipment
+  id: string;                // Unique identifier
+  id_: string;               // Alternative identifier
+  blog: string;              // Detailed instructions (markdown)
+  images: string[];          // Reference images
+  gifUrl: string;            // Animated demonstration
+  videos: string[];          // Instructional videos
+  keywords: string[];        // Searchable keywords
+}
+```
+
+### What's included
+
+<Accordion title="Target muscle and body part">
+  Each exercise specifies which muscles it targets and which body part is primarily engaged. For example:
+  - **Target**: pectorals, quadriceps, latissimus dorsi
+  - **Body part**: chest, legs, back, shoulders, arms
+  
+  This helps you build balanced workout routines that target specific muscle groups.
+</Accordion>
+
+<Accordion title="Equipment requirements">
+  Exercises are categorized by the equipment needed:
+  - Barbell, dumbbell, kettlebell
+  - Cable, resistance band
+  - Body weight (no equipment)
+  - Machine (Smith machine, leg press, etc.)
+  - And 30+ more equipment types
+</Accordion>
+
+<Accordion title="Visual demonstrations">
+  Multiple formats help you learn proper form:
+  - **Animated GIF**: Shows the complete movement pattern
+  - **Reference images**: Multiple angles and positions
+  - **Instructional videos**: Detailed explanations and tips
+</Accordion>
+
+<Accordion title="Detailed instructions">
+  Written instructions in markdown format include:
+  - Step-by-step execution
+  - Form tips and common mistakes
+  - Variations and modifications
+  - Safety considerations
+</Accordion>
+
+## How exercises are displayed
+
+### Exercise cards
+
+Exercises appear as interactive 3D cards throughout the platform. Each card shows:
+
+- Exercise name/title
+- Animated GIF preview
+- Brief description excerpt
+- 3D hover effects for visual engagement
+
+```tsx exercise-card.tsx
+export const Card = ({ name, image, path, searchName }: ICardProps) => {
+  return (
+    <Link href={`/${path}/${searchName ? searchName : name}`}>
+      <div className={"transition-all duration-200 hover:scale-110"}>
+        <CardContainer className="xs:max-w-62 sm:max-w-80 lg:max-w-68">
+          <CardBody className="group/card scrollbar-hide relative h-fit! mt-10 overflow-hidden rounded-xl border border-black/20 bg-gray-50 p-6 shadow-lg shadow-amber-900 transition-all duration-300 hover:-translate-y-6 dark:border-gray-800 dark:bg-black dark:shadow-pink-500 dark:hover:shadow-2xl dark:hover:shadow-emerald-500/10">
+            <CardItem translateZ="100" rotateX={20} rotateZ={-10} className="mt-4 w-full">
+              <Image
+                src={image}
+                className="h-60 w-full rounded-xl object-cover group-hover/card:shadow-xl"
+                quality={100}
+                width={1000}
+                height={1000}
+                alt={"photo"}
+              />
+            </CardItem>
+            <CardItem className="text-xl mt-5 w-full font-bold text-gray-800 dark:text-white">
+              <p className="text-center">{name}</p>
+            </CardItem>
+          </CardBody>
+        </CardContainer>
+      </div>
+    </Link>
+  );
+};
+```
+
+### Exercise detail pages
+
+Clicking on an exercise card opens a comprehensive detail page with:
+
+<Steps>
+  <Step title="Exercise header">
+    Large title with the exercise name, plus key metadata:
+    - **Target muscle**: Primary muscle worked
+    - **Body part**: Main area trained  
+    - **Equipment**: What you need
+    - **Muscles worked**: Complete list of engaged muscles
+  </Step>
+  
+  <Step title="Animated demonstration">
+    Large animated GIF showing proper form and movement pattern
+  </Step>
+  
+  <Step title="Reference images carousel">
+    Multiple images showing different angles and positions. Navigate through images using carousel controls.
+  </Step>
+  
+  <Step title="Video tutorials">
+    Embedded YouTube videos with detailed instructions and tips. Videos display in a carousel for easy browsing.
+  </Step>
+  
+  <Step title="Written instructions">
+    Full markdown-formatted guide with:
+    - Execution steps
+    - Form cues
+    - Common mistakes to avoid
+    - Variations and progressions
+  </Step>
+</Steps>
+
+<Note>
+  The exercise detail page at `app/exercises/[exerciseId]/page.tsx` uses dynamic routing to load exercise data based on the exercise ID in the URL.
+</Note>
+
+## Example exercise data
+
+Here's what a complete exercise entry looks like:
+
+```json
+{
+  "name": "barbell-bench-press",
+  "title": "Barbell Bench Press",
+  "target": "pectorals",
+  "muscles_worked": "pectorals, triceps, anterior deltoids",
+  "bodyPart": "chest",
+  "equipment": "barbell",
+  "id": "bench-press-001",
+  "id_": "0001",
+  "blog": "## How to Perform\n\n1. Lie on bench with feet flat...\n2. Grip bar slightly wider than shoulders...\n3. Lower bar to mid-chest with control...\n4. Press bar up until arms fully extended...",
+  "images": [
+    "https://example.com/bench-press-1.jpg",
+    "https://example.com/bench-press-2.jpg",
+    "https://example.com/bench-press-3.jpg"
+  ],
+  "gifUrl": "https://example.com/bench-press.gif",
+  "videos": [
+    "https://youtube.com/watch?v=..."
+  ],
+  "keywords": ["chest", "press", "barbell", "strength", "compound"]
+}
+```
+
+## Browsing exercises
+
+You can browse exercises in multiple ways:
+
+### All exercises page
+
+The main exercises page (`/exercises`) displays all exercises with:
+- Search bar for filtering by name
+- Pagination (9 exercises per page)
+- Grid layout with exercise cards
+- Responsive design for all screen sizes
+
+### Filtered views
+
+Browse exercises filtered by:
+- **Body part**: `/body-parts/chest`, `/body-parts/legs`, etc.
+- **Equipment**: `/equipments/barbell`, `/equipments/dumbbell`, etc.
+- **Target muscle**: `/target-muscles/pectorals`, `/target-muscles/quadriceps`, etc.
+
+<Card title="Next: Learn about routines" icon="calendar-days" href="/features/routines">
+  Discover 600+ pre-built workout routines for every fitness level and goal
+</Card>

@@ -1,80 +1,215 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Get started with BodyWorks in minutes. Access the platform, explore exercises, and start your fitness journey.
 ---
 
-## Get started in three steps
+# Quickstart
 
-Get your documentation site running locally and make your first customization.
+Get up and running with BodyWorks in just a few minutes. This guide will help you access the platform and make the most of its features.
 
-### Step 1: Set up your local environment
+## Access BodyWorks
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+The easiest way to use BodyWorks is through the live platform:
+
+<Card title="Live Platform" icon="globe" href="https://bodyworks.akshatjaiswal.me">
+  Visit **bodyworks.akshatjaiswal.me** to start exploring exercises and routines immediately.
+</Card>
+
+No registration or installation required - simply visit the site and start browsing!
+
+## First steps
+
+Once you access BodyWorks, here's how to make the most of the platform:
+
+### Browse exercises
+
+The exercises page is your gateway to 1300+ exercises:
+
+<Steps>
+  <Step title="Navigate to exercises">
+    Click on the **"Explore for free"** button on the homepage or navigate to `/exercises` to view the exercise database.
+  </Step>
+  
+  <Step title="Explore exercise details">
+    Each exercise card displays:
+    - Animated GIF demonstration
+    - Exercise title
+    - Brief description
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    Click on any exercise to view full details including instructions and muscle targeting information.
+  </Step>
+  
+  <Step title="Use the search feature">
+    Type in the search bar to find specific exercises by name. The search is real-time and filters results as you type.
+  </Step>
+</Steps>
+
+### Filter by body parts
+
+Target specific areas of your body with the body parts filter:
+
+<Steps>
+  <Step title="Navigate to body parts">
+    Visit `/body-parts` to see all 10+ body part categories including:
+    - Back
+    - Chest
+    - Legs
+    - Arms
+    - Shoulders
+    - Core
+  </Step>
+  
+  <Step title="Select a body part">
+    Click on any body part card to view all exercises targeting that specific region.
+  </Step>
+  
+  <Step title="Refine your selection">
+    Within a body part category, you can further filter by equipment or target muscle for precise exercise selection.
+  </Step>
+</Steps>
+
+### Filter by equipment
+
+Find exercises based on your available equipment:
+
+<Steps>
+  <Step title="Navigate to equipment">
+    Go to `/equipments` to browse exercises by equipment type.
+  </Step>
+  
+  <Step title="Choose your equipment">
+    Select from 30+ equipment options including:
+    - Barbell
+    - Dumbbell
+    - Resistance bands
+    - Body weight (no equipment)
+    - Cable machine
+    - Kettlebell
+    - And many more
+  </Step>
+  
+  <Step title="View filtered exercises">
+    See all exercises that can be performed with your selected equipment.
+  </Step>
+</Steps>
+
+### Filter by target muscle
+
+Focus on specific muscle groups:
+
+<Steps>
+  <Step title="Navigate to target muscles">
+    Visit `/target-muscle` to see 20+ muscle group options.
+  </Step>
+  
+  <Step title="Select target muscle">
+    Choose the muscle you want to train, such as:
+    - Biceps
+    - Quadriceps
+    - Deltoids
+    - Hamstrings
+    - Pectorals
+    - Latissimus dorsi
+  </Step>
+  
+  <Step title="Explore targeted exercises">
+    View all exercises specifically designed to target your selected muscle group.
+  </Step>
+</Steps>
+
+### Explore workout routines
+
+Access structured workout programs:
+
+<Steps>
+  <Step title="Navigate to routines">
+    Go to `/routines` to browse 600+ pre-built workout routines.
+  </Step>
+  
+  <Step title="Apply filters">
+    Filter routines by:
+    - Duration (1 week to 52 weeks)
+    - Gender (men's workouts, women's workouts)
+    - Experience level (beginner, intermediate, advanced)
+    - Workout type (strength, hypertrophy, endurance)
+  </Step>
+  
+  <Step title="Select a routine">
+    Click on a routine to view the complete program details, including exercises, sets, reps, and scheduling.
+  </Step>
+</Steps>
+
+## Run locally (for developers)
+
+If you want to run BodyWorks on your local machine for development:
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/Akshat-Jaiswal-8/body-works-next.git
+    cd body-works-next
+    ```
+  </Step>
+  
+  <Step title="Install dependencies">
+    ```bash
+    bun install
+    ```
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+    <Note>
+      BodyWorks uses Bun as the package manager for faster installation and better performance.
+    </Note>
+  </Step>
+  
+  <Step title="Start the development server">
+    ```bash
+    bun run dev
+    ```
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    The application will be available at `http://localhost:3000`.
+  </Step>
+  
+  <Step title="Explore the codebase">
+    - Main application code: `app/` directory
+    - Components: `components/` directory
+    - Hooks for API calls: `hooks/` directory
+    - Utilities: `lib/` directory
+  </Step>
+</Steps>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+<Warning>
+  The development server uses Turbopack for fast refresh. Make sure you're using Node.js 18+ for compatibility.
+</Warning>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+## Tips for best results
 
-### Step 3: Go live
+<Tip>
+  **Combine filters** - Use multiple filters together (body part + equipment) to find exercises that perfectly match your needs and available resources.
+</Tip>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+<Tip>
+  **Bookmark favorites** - Keep track of exercises you want to try by bookmarking specific exercise pages.
+</Tip>
+
+<Tip>
+  **Use routines** - If you're new to fitness, start with a beginner routine rather than creating your own program from scratch.
+</Tip>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
+Now that you're familiar with the basics:
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Explore features" icon="sparkles" href="/features">
+    Dive deeper into BodyWorks' advanced features and capabilities.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Learn how to integrate the Body Works API into your own applications.
+  </Card>
+  <Card title="Development setup" icon="wrench" href="/installation">
+    Set up a complete local development environment.
+  </Card>
+  <Card title="Contributing" icon="git-pull-request" href="/contributing">
+    Contribute to BodyWorks and help improve the platform.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

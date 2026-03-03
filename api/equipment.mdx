@@ -1,0 +1,192 @@
+---
+title: 'Get Equipment'
+api: 'GET /equipments'
+description: 'Retrieve a list of equipment types used in exercises'
+---
+
+## Endpoint
+
+```
+GET /api/equipments
+```
+
+Retrieve a list of equipment types available in the BodyWorks database. Equipment types are used to categorize exercises and help users find exercises based on available equipment.
+
+## Query Parameters
+
+<ParamField query="limit" type="number" optional>
+  The maximum number of equipment types to return. If not specified, returns all available equipment.
+</ParamField>
+
+## Response
+
+<ResponseField name="totalEquipments" type="number">
+  The total number of equipment types available in the database.
+</ResponseField>
+
+<ResponseField name="data" type="IEquipment[]">
+  An array of equipment objects.
+  
+  <Expandable title="Equipment Object">
+    <ResponseField name="equipment" type="string">
+      The name of the equipment type (e.g., "barbell", "dumbbell", "cable", "bodyweight").
+    </ResponseField>
+    
+    <ResponseField name="imageUrl" type="string">
+      URL to an image representing this equipment type.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    # Get all equipment types
+    curl -X GET "https://api.bodyworks.com/api/equipments"
+
+    # Get limited number of equipment types
+    curl -X GET "https://api.bodyworks.com/api/equipments?limit=10"
+    ```
+  </Tab>
+  
+  <Tab title="axios">
+    ```javascript
+    import axios from 'axios';
+
+    const getEquipments = async (limit) => {
+      const response = await axios.get('/api/equipments', {
+        params: {
+          limit
+        }
+      });
+      return response.data;
+    };
+
+    // Get all equipment types
+    const allEquipments = await getEquipments();
+
+    // Get limited equipment types
+    const limitedEquipments = await getEquipments(10);
+    ```
+  </Tab>
+  
+  <Tab title="fetch">
+    ```javascript
+    const getEquipments = async (limit) => {
+      const url = limit 
+        ? `/api/equipments?limit=${limit}`
+        : '/api/equipments';
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      return data;
+    };
+
+    // Get all equipment types
+    const allEquipments = await getEquipments();
+
+    // Get limited equipment types
+    const limitedEquipments = await getEquipments(10);
+    ```
+  </Tab>
+</Tabs>
+
+## Example Response
+
+```json
+{
+  "totalEquipments": 15,
+  "data": [
+    {
+      "equipment": "barbell",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/barbell.png"
+    },
+    {
+      "equipment": "dumbbell",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/dumbbell.png"
+    },
+    {
+      "equipment": "bodyweight",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/bodyweight.png"
+    },
+    {
+      "equipment": "cable",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/cable.png"
+    },
+    {
+      "equipment": "machine",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/machine.png"
+    },
+    {
+      "equipment": "kettlebell",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/kettlebell.png"
+    },
+    {
+      "equipment": "resistance band",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/resistance-band.png"
+    },
+    {
+      "equipment": "ez bar",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/ez-bar.png"
+    },
+    {
+      "equipment": "smith machine",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/smith-machine.png"
+    },
+    {
+      "equipment": "stability ball",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/stability-ball.png"
+    },
+    {
+      "equipment": "medicine ball",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/medicine-ball.png"
+    },
+    {
+      "equipment": "foam roller",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/foam-roller.png"
+    },
+    {
+      "equipment": "pull-up bar",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/pull-up-bar.png"
+    },
+    {
+      "equipment": "trap bar",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/trap-bar.png"
+    },
+    {
+      "equipment": "suspension trainer",
+      "imageUrl": "https://cdn.bodyworks.com/equipment/suspension-trainer.png"
+    }
+  ]
+}
+```
+
+## Error Responses
+
+<ResponseField name="400 Bad Request">
+  ```json
+  {
+    "error": "Invalid limit parameter",
+    "message": "Limit must be a positive integer"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error">
+  ```json
+  {
+    "error": "Internal server error",
+    "message": "Failed to fetch equipment types from database"
+  }
+  ```
+</ResponseField>
+
+## Use Cases
+
+- **Exercise Filtering**: Filter exercises by available equipment
+- **Gym Setup**: Help users find exercises based on their home gym equipment
+- **Workout Customization**: Create workouts based on equipment availability
+- **Equipment Recommendations**: Suggest equipment for specific training goals
+- **User Interface**: Populate equipment filters and selection menus

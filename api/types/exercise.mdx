@@ -1,0 +1,279 @@
+---
+title: 'Exercise Types'
+description: 'TypeScript interfaces for exercise data and responses'
+---
+
+## Overview
+
+The exercise types define the structure for exercise data, including individual exercises and paginated responses. These types ensure type safety when working with exercise data throughout your application.
+
+## IExercise
+
+Represents a single exercise with all its properties.
+
+```typescript types.d.ts
+interface IExercise {
+  name: string;
+  title: string;
+  target: string;
+  muscles_worked: string;
+  bodyPart: string;
+  equipment: string;
+  id: string;
+  id_: string;
+  blog: string;
+  images: string[];
+  gifUrl: string;
+  videos: string[];
+  keywords: string[];
+}
+```
+
+### Properties
+
+<ResponseField name="name" type="string" required>
+  Unique identifier name for the exercise (usually lowercase with hyphens)
+</ResponseField>
+
+<ResponseField name="title" type="string" required>
+  Display title of the exercise for user interfaces
+</ResponseField>
+
+<ResponseField name="target" type="string" required>
+  Primary target muscle or muscle group
+</ResponseField>
+
+<ResponseField name="muscles_worked" type="string" required>
+  Comma-separated list of all muscles engaged during the exercise
+</ResponseField>
+
+<ResponseField name="bodyPart" type="string" required>
+  Body part category (e.g., "chest", "back", "legs")
+</ResponseField>
+
+<ResponseField name="equipment" type="string" required>
+  Required equipment for the exercise (e.g., "barbell", "bodyweight")
+</ResponseField>
+
+<ResponseField name="id" type="string" required>
+  Primary identifier for the exercise
+</ResponseField>
+
+<ResponseField name="id_" type="string" required>
+  Alternative identifier for the exercise
+</ResponseField>
+
+<ResponseField name="blog" type="string" required>
+  URL or path to related blog content or detailed instructions
+</ResponseField>
+
+<ResponseField name="images" type="string[]" required>
+  Array of image URLs showing exercise form and technique
+</ResponseField>
+
+<ResponseField name="gifUrl" type="string" required>
+  Animated GIF URL demonstrating the exercise movement
+</ResponseField>
+
+<ResponseField name="videos" type="string[]" required>
+  Array of video URLs with exercise tutorials and demonstrations
+</ResponseField>
+
+<ResponseField name="keywords" type="string[]" required>
+  Search keywords and tags for exercise discovery
+</ResponseField>
+
+## IExerciseData
+
+Paginated response containing multiple exercises.
+
+```typescript types.d.ts
+interface IExerciseData {
+  totalExercises: number;
+  totalPages: number;
+  data: IExercise[];
+}
+```
+
+### Properties
+
+<ResponseField name="totalExercises" type="number" required>
+  Total count of exercises matching the query
+</ResponseField>
+
+<ResponseField name="totalPages" type="number" required>
+  Total number of pages available for pagination
+</ResponseField>
+
+<ResponseField name="data" type="IExercise[]" required>
+  Array of exercise objects for the current page
+</ResponseField>
+
+## IExerciseResponse
+
+Wrapper for a single exercise response.
+
+```typescript types.d.ts
+interface IExerciseResponse {
+  data: IExercise;
+}
+```
+
+### Properties
+
+<ResponseField name="data" type="IExercise" required>
+  Single exercise object
+</ResponseField>
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Fetching Exercises">
+    ```typescript
+    import { IExerciseData } from './types';
+
+    async function getExercises(
+      page: number = 1,
+      limit: number = 10
+    ): Promise<IExerciseData> {
+      const response = await fetch(
+        `https://api.bodyworks.io/exercises?page=${page}&limit=${limit}`
+      );
+      return response.json();
+    }
+
+    // Type-safe usage
+    const exercises = await getExercises(1, 20);
+    console.log(`Total: ${exercises.totalExercises}`);
+    console.log(`Pages: ${exercises.totalPages}`);
+    
+    exercises.data.forEach((exercise: IExercise) => {
+      console.log(`${exercise.title} - ${exercise.target}`);
+    });
+    ```
+  </Tab>
+
+  <Tab title="Single Exercise">
+    ```typescript
+    import { IExerciseResponse, IExercise } from './types';
+
+    async function getExerciseById(id: string): Promise<IExercise> {
+      const response = await fetch(
+        `https://api.bodyworks.io/exercises/${id}`
+      );
+      const result: IExerciseResponse = await response.json();
+      return result.data;
+    }
+
+    // Type-safe usage
+    const exercise = await getExerciseById('bench-press');
+    console.log(exercise.title);
+    console.log(exercise.target);
+    console.log(exercise.equipment);
+    console.log(exercise.gifUrl);
+    ```
+  </Tab>
+
+  <Tab title="Filtering by Type">
+    ```typescript
+    import { IExerciseData, IExercise } from './types';
+
+    function filterByBodyPart(
+      exerciseData: IExerciseData,
+      bodyPart: string
+    ): IExercise[] {
+      return exerciseData.data.filter(
+        (exercise) => exercise.bodyPart.toLowerCase() === bodyPart.toLowerCase()
+      );
+    }
+
+    function filterByEquipment(
+      exerciseData: IExerciseData,
+      equipment: string
+    ): IExercise[] {
+      return exerciseData.data.filter(
+        (exercise) => exercise.equipment.toLowerCase() === equipment.toLowerCase()
+      );
+    }
+
+    // Usage
+    const allExercises = await getExercises();
+    const chestExercises = filterByBodyPart(allExercises, 'chest');
+    const barbellExercises = filterByEquipment(allExercises, 'barbell');
+    ```
+  </Tab>
+
+  <Tab title="React Component">
+    ```typescript
+    import React, { useState, useEffect } from 'react';
+    import { IExercise, IExerciseData } from './types';
+
+    interface ExerciseListProps {
+      bodyPart?: string;
+    }
+
+    export const ExerciseList: React.FC<ExerciseListProps> = ({ bodyPart }) => {
+      const [exercises, setExercises] = useState<IExercise[]>([]);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        async function fetchExercises() {
+          const response = await fetch(
+            `https://api.bodyworks.io/exercises${bodyPart ? `?bodyPart=${bodyPart}` : ''}`
+          );
+          const data: IExerciseData = await response.json();
+          setExercises(data.data);
+          setLoading(false);
+        }
+
+        fetchExercises();
+      }, [bodyPart]);
+
+      if (loading) return <div>Loading...</div>;
+
+      return (
+        <div>
+          {exercises.map((exercise) => (
+            <div key={exercise.id}>
+              <h3>{exercise.title}</h3>
+              <img src={exercise.gifUrl} alt={exercise.title} />
+              <p>Target: {exercise.target}</p>
+              <p>Equipment: {exercise.equipment}</p>
+            </div>
+          ))}
+        </div>
+      );
+    };
+    ```
+  </Tab>
+</Tabs>
+
+## Type Guards
+
+Create type guards to safely validate exercise data:
+
+```typescript
+function isValidExercise(obj: any): obj is IExercise {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.name === 'string' &&
+    typeof obj.title === 'string' &&
+    typeof obj.target === 'string' &&
+    typeof obj.bodyPart === 'string' &&
+    typeof obj.equipment === 'string' &&
+    Array.isArray(obj.images) &&
+    Array.isArray(obj.videos) &&
+    Array.isArray(obj.keywords)
+  );
+}
+
+function isExerciseData(obj: any): obj is IExerciseData {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.totalExercises === 'number' &&
+    typeof obj.totalPages === 'number' &&
+    Array.isArray(obj.data) &&
+    obj.data.every(isValidExercise)
+  );
+}
+```

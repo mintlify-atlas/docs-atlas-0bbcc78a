@@ -1,0 +1,757 @@
+---
+title: "React Hooks"
+description: "Custom React hooks for data fetching, state management, and utilities"
+---
+
+## Overview
+
+BodyWorks provides a comprehensive set of custom React hooks built on top of **React Query** (TanStack Query) for efficient data fetching, caching, and state management.
+
+### Hook Categories
+
+<CardGroup cols={3}>
+  <Card title="Data Fetching" icon="database">
+    Hooks for fetching exercises, routines, body parts, equipment, and target muscles
+  </Card>
+
+  <Card title="Single Resource" icon="file">
+    Hooks for fetching individual items by ID
+  </Card>
+
+  <Card title="Utilities" icon="wrench">
+    Device detection and other utility hooks
+  </Card>
+</CardGroup>
+
+## Data Fetching Hooks
+
+All data fetching hooks use React Query for caching, automatic refetching, and optimistic updates.
+
+### useExercises
+
+Fetches a paginated list of exercises.
+
+<Tabs>
+  <Tab title="Usage">
+    ```tsx
+    import useExercises from "@/hooks/useExercises";
+
+    function ExerciseList() {
+      const { exercises, isLoading, error, refetch } = useExercises(9, 1);
+
+      if (isLoading) return <Skeleton />;
+      if (error) return <div>Error loading exercises</div>;
+
+      return (
+        <div>
+          {exercises?.data.map((exercise) => (
+            <ExerciseCard key={exercise.id} {...exercise} />
+          ))}
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Parameters">
+    | Parameter | Type | Default | Description |
+    |-----------|------|---------|-------------|
+    | `limit` | `number` | `9` | Number of exercises per page |
+    | `page` | `number` | `1` | Current page number |
+  </Tab>
+
+  <Tab title="Returns">
+    ```tsx
+    {
+      isLoading: boolean;        // Loading state
+      exercises: IExerciseData;  // Exercise data with pagination
+      error: Error | null;       // Error object if failed
+      refetch: () => void;       // Manual refetch function
+      isRefetching: boolean;     // Refetching state
+    }
+    ```
+  </Tab>
+
+  <Tab title="Implementation">
+    ```tsx
+    // hooks/useExercises.tsx
+    import { keepPreviousData, useQuery } from "@tanstack/react-query";
+    import { apiCaller } from "@/lib/apiCaller";
+
+    const getExercises = async (
+      limit: number,
+      page: number
+    ): Promise<IExerciseData> => {
+      const exercises = await apiCaller.get<IExerciseData>(`/exercises`, {
+        params: { limit, page },
+      });
+      return exercises.data;
+    };
+
+    const useExercises = (limit: number = 9, page: number = 1) => {
+      const {
+        isLoading,
+        data: exercises,
+        error,
+        refetch,
+        isRefetching,
+      } = useQuery({
+        queryKey: ["exercises", limit, page],
+        queryFn: () => getExercises(limit, page),
+        placeholderData: keepPreviousData,
+      });
+      return { isLoading, exercises, error, refetch, isRefetching };
+    };
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  The `keepPreviousData` option ensures smooth pagination by showing previous data while fetching new pages.
+</Note>
+
+### useRoutines
+
+Fetches a paginated list of workout routines.
+
+```tsx
+import { useRoutines } from "@/hooks/useRoutines";
+
+function RoutineList() {
+  const { routines, isLoading, error } = useRoutines(6, 1);
+
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {routines?.data.map((routine) => (
+        <RoutineCard key={routine.id} {...routine} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Parameters:**
+- `limit: number` - Number of routines per page
+- `page: number` - Current page number
+
+**Returns:**
+```tsx
+{
+  isLoading: boolean;
+  routines: IRoutinesResponse;
+  error: Error | null;
+  refetch: () => void;
+  isRefetching: boolean;
+}
+```
+
+### useBodyParts
+
+Fetches all body parts with optional limit.
+
+<Tabs>
+  <Tab title="Usage">
+    ```tsx
+    import { useBodyParts } from "@/hooks/useBodyParts";
+
+    function BodyPartFilter() {
+      const { bodyParts, isLoading } = useBodyParts(20);
+
+      return (
+        <select>
+          {bodyParts?.data.map((part) => (
+            <option key={part.id} value={part.id}>
+              {part.name}
+            </option>
+          ))}
+        </select>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Source">
+    ```tsx
+    // hooks/useBodyParts.tsx
+    import { keepPreviousData, useQuery } from "@tanstack/react-query";
+    import { apiCaller } from "@/lib/apiCaller";
+
+    const getBodyParts = async (limit?: number): Promise<IBodyPartData> => {
+      const bodyParts = await apiCaller.get<IBodyPartData>("bodyParts", {
+        params: { limit },
+      });
+      return bodyParts.data;
+    };
+
+    export const useBodyParts = (limit?: number) => {
+      const {
+        isLoading,
+        data: bodyParts,
+        error,
+        refetch,
+        isRefetching,
+      } = useQuery({
+        queryKey: ["body-parts", limit],
+        queryFn: () => getBodyParts(limit),
+        placeholderData: keepPreviousData,
+      });
+      return { isLoading, bodyParts, error, isRefetching, refetch };
+    };
+    ```
+  </Tab>
+</Tabs>
+
+### useEquipments
+
+Fetches all available equipment.
+
+```tsx
+import { useEquipments } from "@/hooks/useEquipments";
+
+function EquipmentFilter() {
+  const { equipments, isLoading } = useEquipments();
+
+  return (
+    <div className="flex gap-2">
+      {equipments?.data.map((equipment) => (
+        <Button key={equipment.id} variant="outline">
+          {equipment.name}
+        </Button>
+      ))}
+    </div>
+  );
+}
+```
+
+### useTargetMuscles
+
+Fetches all target muscles with optional limit.
+
+```tsx
+import { useTargetMuscles } from "@/hooks/useTargetMuscles";
+
+function MuscleGroupFilter() {
+  const { targetMuscles, isLoading } = useTargetMuscles(15);
+
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {targetMuscles?.data.map((muscle) => (
+        <Card key={muscle.id}>
+          <h3>{muscle.name}</h3>
+        </Card>
+      ))}
+    </div>
+  );
+}
+```
+
+## Single Resource Hooks
+
+Hooks for fetching individual items by ID.
+
+### useExercise
+
+Fetches a single exercise by ID.
+
+<Tabs>
+  <Tab title="Usage">
+    ```tsx
+    import { useExercise } from "@/hooks/useExercise";
+    import { useParams } from "next/navigation";
+
+    function ExerciseDetail() {
+      const params = useParams();
+      const { exercise, isLoading, error } = useExercise(params.id as string);
+
+      if (isLoading) return <Skeleton className="h-96" />;
+      if (error) {
+        toast.error("Failed to load exercise");
+        return null;
+      }
+
+      return (
+        <div>
+          <h1>{exercise?.name}</h1>
+          <img src={exercise?.gifUrl} alt={exercise?.name} />
+          <p>{exercise?.instructions}</p>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Error Handling">
+    The hook includes built-in error handling with toast notifications:
+
+    ```tsx
+    // hooks/useExercise.tsx
+    import { toast } from "sonner";
+
+    const getExercise = async (
+      exerciseId: string | undefined
+    ): Promise<IExercise> => {
+      if (!exerciseId) {
+        toast.error("Exercise ID is required", {
+          description: "Please provide an exercise ID",
+        });
+      }
+      const exercise = await apiCaller.get<IExerciseResponse>(
+        `exercises/${exerciseId}`
+      );
+      return exercise.data.data;
+    };
+    ```
+  </Tab>
+
+  <Tab title="Implementation">
+    ```tsx
+    // hooks/useExercise.tsx
+    import { useQuery } from "@tanstack/react-query";
+    import { apiCaller } from "@/lib/apiCaller";
+
+    export const useExercise = (exerciseId: string | undefined) => {
+      const {
+        isLoading,
+        data: exercise,
+        error,
+        refetch,
+        isRefetching,
+      } = useQuery({
+        queryKey: ["exercise", exerciseId],
+        queryFn: () => getExercise(exerciseId),
+      });
+      return { isLoading, exercise, error, refetch, isRefetching };
+    };
+    ```
+  </Tab>
+</Tabs>
+
+### useRoutine
+
+Fetches a single routine by ID.
+
+```tsx
+import { useRoutine } from "@/hooks/useRoutine";
+
+function RoutineDetail({ routineId }: { routineId: string }) {
+  const { routine, isLoading, error, refetch } = useRoutine(routineId);
+
+  return (
+    <div>
+      <h1>{routine?.title}</h1>
+      <p>{routine?.description}</p>
+      <Button onClick={() => refetch()}>Refresh</Button>
+    </div>
+  );
+}
+```
+
+### useBodyPart
+
+Fetches a single body part by ID.
+
+```tsx
+import { useBodyPart } from "@/hooks/useBodyPart";
+
+function BodyPartDetail({ bodyPartId }: { bodyPartId: string }) {
+  const { bodyPart, isLoading } = useBodyPart(bodyPartId);
+
+  return <h2>{bodyPart?.name}</h2>;
+}
+```
+
+### useEquipment
+
+Fetches a single equipment item by ID.
+
+```tsx
+import { useEquipment } from "@/hooks/useEquipment";
+
+function EquipmentDetail({ equipmentId }: { equipmentId: string }) {
+  const { equipment, isLoading } = useEquipment(equipmentId);
+
+  return <div>{equipment?.name}</div>;
+}
+```
+
+### useTargetMuscle
+
+Fetches a single target muscle by ID.
+
+```tsx
+import { useTargetMuscle } from "@/hooks/useTargetMuscle";
+
+function TargetMuscleDetail({ muscleId }: { muscleId: string }) {
+  const { targetMuscle, isLoading } = useTargetMuscle(muscleId);
+
+  return <h3>{targetMuscle?.name}</h3>;
+}
+```
+
+### useRoutinesCategory
+
+Fetches routines by category.
+
+```tsx
+import { useRoutinesCategory } from "@/hooks/useRoutinesCategory";
+
+function CategoryRoutines({ category }: { category: string }) {
+  const { routines, isLoading } = useRoutinesCategory(category);
+
+  return (
+    <div>
+      {routines?.data.map((routine) => (
+        <RoutineCard key={routine.id} {...routine} />
+      ))}
+    </div>
+  );
+}
+```
+
+## Utility Hooks
+
+General-purpose utility hooks.
+
+### useDevice
+
+Detects device type and custom media queries.
+
+<Tabs>
+  <Tab title="Basic Usage">
+    ```tsx
+    import useDevice from "@/hooks/useDevice";
+
+    function ResponsiveComponent() {
+      const { isMobile, isTablet, isDesktop, isDesktopLarge } = useDevice();
+
+      return (
+        <div>
+          {isMobile && <MobileNav />}
+          {isTablet && <TabletNav />}
+          {isDesktop && <DesktopNav />}
+          {isDesktopLarge && <LargeDesktopNav />}
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Custom Queries">
+    ```tsx
+    // Single custom query
+    const { customQuery } = useDevice("(min-width: 1440px)");
+
+    // Multiple custom queries
+    const { customQueries } = useDevice([
+      "(orientation: portrait)",
+      "(prefers-reduced-motion: reduce)",
+    ]);
+
+    const [isPortrait, prefersReducedMotion] = customQueries;
+    ```
+  </Tab>
+
+  <Tab title="Breakpoints">
+    | Device | Query | Width |
+    |--------|-------|-------|
+    | Mobile | `max-width: 767px` | ≤ 767px |
+    | Tablet | `min-width: 768px and max-width: 1024px` | 768px - 1024px |
+    | Desktop | `min-width: 1025px and max-width: 2379px` | 1025px - 2379px |
+    | Desktop Large | `min-width: 2380px` | ≥ 2380px |
+  </Tab>
+
+  <Tab title="Implementation">
+    ```tsx
+    // hooks/useDevice.tsx
+    "use client";
+
+    import { useEffect, useState } from "react";
+
+    const useMediaQuery = (query: string): boolean => {
+      const [matches, setMatches] = useState(false);
+      const [mounted, setMounted] = useState(false);
+
+      useEffect(() => {
+        setMounted(true);
+        if (typeof window === "undefined") return;
+
+        const media = window.matchMedia(query);
+        setMatches(media.matches);
+
+        const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
+        media.addEventListener("change", listener);
+
+        return () => media.removeEventListener("change", listener);
+      }, [query]);
+
+      return mounted ? matches : false;
+    };
+
+    const useDevice = (queries?: string | string[]) => {
+      const isMobile = useMediaQuery("only screen and (max-width : 767px)");
+      const isTablet = useMediaQuery(
+        "only screen and (min-width : 768px) and (max-width : 1024px)"
+      );
+      const isDesktop = useMediaQuery(
+        "only screen and (min-width : 1025px) and (max-width : 2379px)"
+      );
+      const isDesktopLarge = useMediaQuery("only screen and (min-width : 2380px)");
+
+      const singleQuery =
+        typeof queries === "string" ? useMediaQuery(queries) : false;
+
+      const multipleQueries = Array.isArray(queries)
+        ? queries.map((query) => useMediaQuery(query))
+        : [];
+
+      return {
+        isMobile,
+        isTablet,
+        isDesktop,
+        isDesktopLarge,
+        customQuery: singleQuery,
+        customQueries: multipleQueries,
+      };
+    };
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+  The `useDevice` hook returns `false` for all queries during SSR. Ensure your components handle this gracefully to avoid hydration mismatches.
+</Warning>
+
+## Hook Patterns
+
+Common patterns when using BodyWorks hooks.
+
+### Pagination Pattern
+
+```tsx
+import useExercises from "@/hooks/useExercises";
+import { Pagination } from "@/components/ui/pagination";
+import { useState } from "react";
+
+function ExercisePagination() {
+  const [page, setPage] = useState(1);
+  const limit = 9;
+  const { exercises, isLoading, isRefetching } = useExercises(limit, page);
+
+  return (
+    <div>
+      {(isLoading || isRefetching) && <Skeleton />}
+      
+      <div className="grid grid-cols-3 gap-4">
+        {exercises?.data.map((exercise) => (
+          <ExerciseCard key={exercise.id} {...exercise} />
+        ))}
+      </div>
+
+      <Pagination
+        currentPage={page}
+        totalPages={exercises?.pagination.totalPages}
+        onPageChange={setPage}
+      />
+    </div>
+  );
+}
+```
+
+### Combined Filters Pattern
+
+```tsx
+import useExercises from "@/hooks/useExercises";
+import { useBodyParts } from "@/hooks/useBodyParts";
+import { useEquipments } from "@/hooks/useEquipments";
+
+function ExerciseFilters() {
+  const { bodyParts } = useBodyParts();
+  const { equipments } = useEquipments();
+  const { exercises, refetch } = useExercises();
+
+  const [selectedBodyPart, setSelectedBodyPart] = useState("");
+  const [selectedEquipment, setSelectedEquipment] = useState("");
+
+  useEffect(() => {
+    refetch();
+  }, [selectedBodyPart, selectedEquipment]);
+
+  return (
+    <div>
+      <select onChange={(e) => setSelectedBodyPart(e.target.value)}>
+        {bodyParts?.data.map((part) => (
+          <option key={part.id} value={part.id}>{part.name}</option>
+        ))}
+      </select>
+
+      <select onChange={(e) => setSelectedEquipment(e.target.value)}>
+        {equipments?.data.map((eq) => (
+          <option key={eq.id} value={eq.id}>{eq.name}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+```
+
+### Search with Debounce Pattern
+
+```tsx
+import useExercises from "@/hooks/useExercises";
+import { SearchBar } from "@/components/search-bar";
+import { useState } from "react";
+
+function SearchableExercises() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { exercises, isLoading } = useExercises();
+
+  const filteredExercises = exercises?.data.filter((exercise) =>
+    exercise.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div>
+      <SearchBar getQuery={setSearchQuery} />
+      
+      {isLoading ? (
+        <Skeleton />
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          {filteredExercises?.map((exercise) => (
+            <ExerciseCard key={exercise.id} {...exercise} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### Conditional Rendering Pattern
+
+```tsx
+import { useExercise } from "@/hooks/useExercise";
+import useDevice from "@/hooks/useDevice";
+
+function ExerciseDetailPage({ exerciseId }: { exerciseId: string }) {
+  const { exercise, isLoading, error } = useExercise(exerciseId);
+  const { isMobile } = useDevice();
+
+  if (isLoading) return <Skeleton className="h-screen" />;
+  
+  if (error) {
+    return (
+      <div className="text-center p-8">
+        <h2>Failed to load exercise</h2>
+        <Button onClick={() => window.location.reload()}>
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={isMobile ? "px-4" : "px-8"}>
+      <h1>{exercise?.name}</h1>
+      {/* Exercise details */}
+    </div>
+  );
+}
+```
+
+## React Query Configuration
+
+All data hooks use React Query with these defaults:
+
+```tsx
+// QueryClient configuration
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,     // 5 minutes
+      cacheTime: 10 * 60 * 1000,    // 10 minutes
+      refetchOnWindowFocus: false,   // Don't refetch on window focus
+      retry: 3,                      // Retry failed requests 3 times
+    },
+  },
+});
+```
+
+### Query Keys
+
+Hooks use consistent query key patterns:
+
+```tsx
+// List queries
+["exercises", limit, page]
+["routines", limit, page]
+["body-parts", limit]
+
+// Single resource queries
+["exercise", exerciseId]
+["routine", routineId]
+["body-part", bodyPartId]
+```
+
+<Tip>
+  Query keys are used for caching and invalidation. Use the same key pattern when manually invalidating queries:
+
+  ```tsx
+  queryClient.invalidateQueries(["exercises"]);
+  ```
+</Tip>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Always handle loading states">
+    ```tsx
+    const { data, isLoading, error } = useExercises();
+
+    if (isLoading) return <Skeleton />;
+    if (error) return <ErrorMessage />;
+    
+    return <DataDisplay data={data} />;
+    ```
+  </Accordion>
+
+  <Accordion title="Use isRefetching for better UX">
+    ```tsx
+    const { exercises, isRefetching } = useExercises();
+
+    return (
+      <div>
+        {isRefetching && <LoadingSpinner />}
+        <ExerciseList data={exercises} />
+      </div>
+    );
+    ```
+  </Accordion>
+
+  <Accordion title="Memoize expensive computations">
+    ```tsx
+    const { exercises } = useExercises();
+
+    const sortedExercises = useMemo(
+      () => exercises?.data.sort((a, b) => a.name.localeCompare(b.name)),
+      [exercises]
+    );
+    ```
+  </Accordion>
+
+  <Accordion title="Use placeholderData for smooth pagination">
+    All paginated hooks already use `keepPreviousData` to prevent flickering during page transitions.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/api-reference">
+    Explore the backend API endpoints
+  </Card>
+
+  <Card title="Components" icon="square" href="/components/overview">
+    Learn about UI components and theming
+  </Card>
+</CardGroup>

@@ -1,0 +1,354 @@
+---
+title: Installation
+description: Set up BodyWorks locally for development. Complete guide covering prerequisites, installation, and configuration.
+---
+
+# Installation
+
+This guide will help you set up BodyWorks on your local machine for development and customization.
+
+## Prerequisites
+
+Before installing BodyWorks, ensure you have the following installed:
+
+### Node.js
+
+BodyWorks requires Node.js 18 or higher.
+
+<CodeGroup>
+```bash Check Node.js version
+node --version
+```
+
+```bash Install Node.js (macOS with Homebrew)
+brew install node
+```
+
+```bash Install Node.js (Ubuntu/Debian)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+```bash Install Node.js (Windows with Chocolatey)
+choco install nodejs
+```
+</CodeGroup>
+
+<Note>
+  We recommend using Node.js 20 LTS for the best compatibility and performance.
+</Note>
+
+### Bun (recommended)
+
+BodyWorks uses Bun as the preferred package manager for faster installs and better performance.
+
+<CodeGroup>
+```bash Install Bun (macOS/Linux)
+curl -fsSL https://bun.sh/install | bash
+```
+
+```bash Install Bun (Windows)
+powershell -c "irm bun.sh/install.ps1 | iex"
+```
+
+```bash Verify installation
+bun --version
+```
+</CodeGroup>
+
+<Tip>
+  While Bun is recommended, you can also use npm, yarn, or pnpm as package managers.
+</Tip>
+
+## Clone the repository
+
+Get the BodyWorks source code from GitHub:
+
+```bash
+git clone https://github.com/Akshat-Jaiswal-8/body-works-next.git
+cd body-works-next
+```
+
+## Install dependencies
+
+Install all required packages using your preferred package manager:
+
+<CodeGroup>
+```bash Bun (recommended)
+bun install
+```
+
+```bash npm
+npm install
+```
+
+```bash yarn
+yarn install
+```
+
+```bash pnpm
+pnpm install
+```
+</CodeGroup>
+
+This will install all dependencies including:
+
+- **Next.js 15** - React framework with server components
+- **React 19** - UI library
+- **TypeScript** - Type safety
+- **@tanstack/react-query** - Data fetching and caching
+- **Shadcn UI components** - Pre-built accessible components
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **Motion (Framer Motion)** - Animation library
+- **Axios** - HTTP client for API calls
+- **Lucide React** - Icon library
+
+<Note>
+  Installation with Bun is significantly faster than npm, typically completing in under 30 seconds.
+</Note>
+
+## Environment setup
+
+BodyWorks connects to the Body Works API to fetch exercise and routine data. The API endpoint is already configured in the codebase.
+
+### API configuration
+
+The application uses axios for API calls. The base configuration is located in the hooks directory:
+
+- `hooks/useExercises.tsx` - Fetches exercise data
+- `hooks/useBodyParts.tsx` - Fetches body part categories
+- `hooks/useEquipments.tsx` - Fetches equipment types
+- `hooks/useTargetMuscles.tsx` - Fetches target muscle groups
+
+<Tip>
+  No API key is required for the Body Works API - it's free and open to use.
+</Tip>
+
+### Optional environment variables
+
+If you want to customize the application, you can create a `.env.local` file in the root directory:
+
+```bash .env.local
+# Optional: Analytics
+NEXT_PUBLIC_VERCEL_ANALYTICS_ID=your-analytics-id
+
+# Optional: Custom API endpoint
+NEXT_PUBLIC_API_URL=https://your-api-endpoint.com
+```
+
+<Warning>
+  Never commit `.env.local` or any file containing sensitive information to version control.
+</Warning>
+
+## Run the development server
+
+Start the local development server:
+
+<CodeGroup>
+```bash Bun (recommended)
+bun run dev
+```
+
+```bash npm
+npm run dev
+```
+
+```bash yarn
+yarn dev
+```
+
+```bash pnpm
+pnpm dev
+```
+</CodeGroup>
+
+The development server uses Next.js with Turbopack for ultra-fast hot module replacement (HMR).
+
+Open your browser and navigate to:
+
+```
+http://localhost:3000
+```
+
+You should see the BodyWorks homepage with the hero section displaying:
+
+> "Push yourself harder to become better"
+
+<Note>
+  The first load may take a few seconds while Next.js compiles the pages. Subsequent changes will be reflected instantly thanks to Turbopack.
+</Note>
+
+## Build for production
+
+To create an optimized production build:
+
+<CodeGroup>
+```bash Bun
+bun run build
+```
+
+```bash npm
+npm run build
+```
+
+```bash yarn
+yarn build
+```
+
+```bash pnpm
+pnpm build
+```
+</CodeGroup>
+
+Then start the production server:
+
+<CodeGroup>
+```bash Bun
+bun run start
+```
+
+```bash npm
+npm run start
+```
+
+```bash yarn
+yarn start
+```
+
+```bash pnpm
+pnpm start
+```
+</CodeGroup>
+
+## Project structure
+
+Understanding the codebase organization:
+
+```
+body-works-next/
+├── app/                      # Next.js 15 app directory
+│   ├── (home)/              # Homepage components
+│   │   └── _components/     # Hero, Features, Testimonials, FAQ
+│   ├── exercises/           # Exercise pages
+│   ├── body-parts/          # Body part filter pages
+│   ├── equipments/          # Equipment filter pages
+│   ├── target-muscle/       # Target muscle pages
+│   ├── routines/            # Workout routine pages
+│   ├── layout.tsx           # Root layout with metadata
+│   ├── page.tsx             # Homepage
+│   └── globals.css          # Global styles
+├── components/              # Reusable components
+│   ├── ui/                  # Shadcn UI components
+│   ├── navbar.tsx           # Navigation bar
+│   ├── footer.tsx           # Footer component
+│   ├── exercise-card.tsx    # Exercise display cards
+│   └── descripted-card.tsx  # Cards with descriptions
+├── hooks/                   # Custom React hooks
+│   ├── useExercises.tsx     # Exercise data fetching
+│   ├── useBodyParts.tsx     # Body parts data
+│   ├── useEquipments.tsx    # Equipment data
+│   └── useTargetMuscles.tsx # Target muscle data
+├── lib/                     # Utility functions
+│   └── utils.ts             # Helper utilities
+├── public/                  # Static assets
+│   ├── hero.webp            # Hero image
+│   └── img.webp             # Additional images
+├── package.json             # Dependencies and scripts
+├── next.config.ts           # Next.js configuration
+├── tailwind.config.ts       # Tailwind CSS config
+└── tsconfig.json            # TypeScript config
+```
+
+## Verify installation
+
+Confirm everything is working correctly:
+
+<Steps>
+  <Step title="Check the homepage">
+    Navigate to `http://localhost:3000` and verify the hero section loads with the headline and call-to-action button.
+  </Step>
+  
+  <Step title="Test exercises page">
+    Click "Explore for free" or navigate to `/exercises`. You should see exercise cards loading from the API.
+  </Step>
+  
+  <Step title="Test filtering">
+    Navigate to `/body-parts`, `/equipments`, or `/target-muscle` and verify that categories load correctly.
+  </Step>
+  
+  <Step title="Check routines">
+    Visit `/routines` to ensure workout routines are fetching and displaying properly.
+  </Step>
+  
+  <Step title="Verify React Query devtools">
+    Look for the React Query devtools icon in the bottom corner of your browser. This indicates data fetching is working correctly.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+### Port already in use
+
+If port 3000 is already in use, Next.js will automatically try port 3001. You can also specify a custom port:
+
+```bash
+bun run dev -- -p 3001
+```
+
+### Module not found errors
+
+If you encounter module errors, try cleaning the installation:
+
+<CodeGroup>
+```bash Bun
+rm -rf node_modules
+rm bun.lockb
+bun install
+```
+
+```bash npm
+rm -rf node_modules
+rm package-lock.json
+npm install
+```
+</CodeGroup>
+
+### TypeScript errors
+
+If you see TypeScript errors, ensure you're using TypeScript 5+:
+
+```bash
+bun add -d typescript@latest
+```
+
+### API connection issues
+
+If exercises aren't loading:
+
+1. Check your internet connection
+2. Verify the Body Works API is accessible
+3. Check the browser console for error messages
+4. Ensure React Query is properly configured in `app/providor.tsx`
+
+<Warning>
+  If you're behind a corporate firewall, the Body Works API might be blocked. Contact your network administrator.
+</Warning>
+
+## Next steps
+
+Now that you have BodyWorks running locally:
+
+<CardGroup cols={2}>
+  <Card title="Explore the codebase" icon="code" href="/architecture">
+    Learn about the application architecture and component structure.
+  </Card>
+  <Card title="Customize the UI" icon="palette" href="/customization">
+    Modify styles, themes, and components to match your brand.
+  </Card>
+  <Card title="API integration" icon="plug" href="/api-reference">
+    Understand the Body Works API and how data flows through the app.
+  </Card>
+  <Card title="Contributing" icon="git-pull-request" href="/contributing">
+    Contribute improvements and new features to BodyWorks.
+  </Card>
+</CardGroup>

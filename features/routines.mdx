@@ -1,0 +1,276 @@
+---
+title: Workout routines
+description: Access 600+ pre-built workout routines for every fitness level and goal
+---
+
+## Overview
+
+BodyWorks includes a library of over **600 workout routines** designed by fitness professionals. Each routine is a complete workout plan with structured programming, clear goals, and detailed day-by-day instructions.
+
+<CardGroup cols={2}>
+  <Card title="600+ routines" icon="calendar-days">
+    Programs for beginners, intermediates, and advanced athletes
+  </Card>
+  <Card title="Multiple goals" icon="bullseye">
+    Muscle building, fat loss, strength, endurance, and more
+  </Card>
+  <Card title="Structured plans" icon="list-check">
+    Complete day-by-day workout schedules
+  </Card>
+  <Card title="Detailed summaries" icon="chart-line">
+    Duration, frequency, equipment, and target audience
+  </Card>
+</CardGroup>
+
+## Routine structure
+
+Each routine is a comprehensive workout program with all the details you need to succeed.
+
+### Data structure
+
+```typescript types.d.ts
+interface IRoutine {
+  category: string[];        // Routine categories/tags
+  routine: {
+    routine_title: string;          // Routine name
+    routine_description: string;    // Overview and benefits
+    routine_imageUrl: string;       // Featured image
+    workout_plan: {                 // Day-by-day schedule
+      heading: string;              // Day/week label
+      day_plan: string;             // Detailed plan (markdown)
+    }[];
+    workout_summary: {              // Key details
+      MainGoal: string;             // Primary objective
+      WorkoutType: string;          // Training style
+      TrainingLevel: string;        // Beginner/Intermediate/Advanced
+      ProgramDuration: string;      // Total length
+      DaysPerWeek: number;          // Training frequency
+      TimePerWorkout: string;       // Session duration
+      EquipmentRequired: string;    // What you need
+      TargetGender: string;         // Male/Female/Both
+    };
+  };
+  id_: number;              // Unique identifier
+  id: number;               // Alternative identifier
+}
+```
+
+### Workout plan components
+
+<Tabs>
+  <Tab title="Workout summary">
+    Every routine includes a summary table with essential information:
+    
+    | Field | Description | Examples |
+    |-------|-------------|----------|
+    | **Main goal** | Primary training objective | Muscle building, fat loss, strength |
+    | **Workout type** | Training methodology | Full body, split, circuit, HIIT |
+    | **Training level** | Required experience | Beginner, intermediate, advanced |
+    | **Program duration** | Total length | 4 weeks, 8 weeks, 12 weeks |
+    | **Days per week** | Training frequency | 3, 4, 5, or 6 days |
+    | **Time per workout** | Session length | 30-45 min, 45-60 min, 60-90 min |
+    | **Equipment required** | What you need | Full gym, dumbbells only, bodyweight |
+    | **Target gender** | Designed for | Male, female, or both |
+    
+    This helps you quickly determine if a routine matches your goals and constraints.
+  </Tab>
+  
+  <Tab title="Workout plan">
+    The day-by-day plan breaks down exactly what to do each training session:
+    
+    - **Headings**: Day 1, Week 1, Push Day, etc.
+    - **Day plans**: Complete workout details in markdown format
+      - Exercises to perform
+      - Sets and reps
+      - Rest periods
+      - Form cues and tips
+      - Progression guidelines
+    
+    Plans are formatted in markdown, allowing for:
+    - Structured lists
+    - Bold/italic emphasis
+    - Clear organization
+    - Easy-to-follow instructions
+  </Tab>
+  
+  <Tab title="Categories">
+    Routines are tagged with multiple categories for easy discovery:
+    
+    - Muscle building
+    - Fat loss
+    - Strength training
+    - Powerlifting
+    - Bodybuilding
+    - Full body
+    - Upper/lower split
+    - Push/pull/legs
+    - Home workouts
+    - Gym routines
+    - And many more...
+    
+    Categories appear as clickable links on routine detail pages.
+  </Tab>
+</Tabs>
+
+## How routines are displayed
+
+### Routine cards
+
+Routines appear as cards in the library with 3D hover effects:
+
+```tsx routine-card.tsx
+const RoutineCard = ({
+  routine_title,
+  routine_description,
+  routine_imageUrl,
+}: IRoutineCardProps) => {
+  return (
+    <CardContainer className="font-poppins">
+      <CardBody className="group/card scrollbar-hide relative mx-12 mt-10 h-auto w-full max-w-80 overflow-hidden overflow-y-auto rounded-xl border border-black/20 bg-gray-50 p-6 shadow-lg shadow-amber-900 transition-all duration-300 hover:-translate-y-6 dark:border-gray-800 dark:border-white/20 dark:bg-black dark:shadow-pink-500 dark:hover:shadow-2xl dark:hover:shadow-emerald-500/10 sm:w-120">
+        <CardItem translateZ="50" className="text-xl font-bold text-gray-800 dark:text-white">
+          {routine_title}
+        </CardItem>
+        <CardItem as="p" translateZ="60" className="mt-2 max-w-sm text-sm text-neutral-500 dark:text-neutral-300">
+          {routine_description}
+        </CardItem>
+        <CardItem translateZ="100" rotateX={20} rotateZ={-10} className="mt-4 w-full">
+          <Image
+            src={routine_imageUrl}
+            height="1000"
+            width="1000"
+            quality={100}
+            className="h-60 w-full rounded-xl object-cover group-hover/card:shadow-xl"
+            alt="thumbnail"
+          />
+        </CardItem>
+      </CardBody>
+    </CardContainer>
+  );
+};
+```
+
+Each card shows:
+- Routine title
+- Short description
+- Featured image
+- Interactive 3D effects on hover
+
+### Routine detail pages
+
+Clicking a routine opens a full detail page with all information:
+
+<Steps>
+  <Step title="Header section">
+    - Large title with routine name
+    - Full description explaining goals and benefits
+    - Featured hero image
+  </Step>
+  
+  <Step title="Category tags">
+    Clickable category links for browsing similar routines:
+    - Muscle Building
+    - 4-Day Split
+    - Intermediate
+    - Full Gym
+  </Step>
+  
+  <Step title="Workout summary table">
+    Comprehensive overview table displaying:
+    - Main goal
+    - Workout type
+    - Training level
+    - Program duration
+    - Days per week
+    - Time per workout
+    - Equipment required
+    - Target gender
+  </Step>
+  
+  <Step title="Workout plan">
+    Day-by-day breakdown with:
+    - Section headings (Day 1, Week 1, etc.)
+    - Markdown-formatted workout details
+    - Exercise lists with sets/reps
+    - Form tips and progressions
+  </Step>
+</Steps>
+
+<Note>
+  Routine pages use dynamic routing at `app/routines/[routine]/page.tsx` with the routine ID in the URL.
+</Note>
+
+## Example routine data
+
+Here's a complete example of routine data:
+
+```json
+{
+  "id": 1,
+  "id_": 1,
+  "category": [
+    "Muscle Building",
+    "4-Day Split",
+    "Intermediate",
+    "Hypertrophy"
+  ],
+  "routine": {
+    "routine_title": "4-Day Upper/Lower Split",
+    "routine_description": "A classic 4-day training split focusing on upper and lower body development. Perfect for intermediate lifters looking to build muscle mass and strength.",
+    "routine_imageUrl": "https://example.com/upper-lower-split.jpg",
+    "workout_summary": {
+      "MainGoal": "Build Muscle",
+      "WorkoutType": "Split",
+      "TrainingLevel": "Intermediate",
+      "ProgramDuration": "8 Weeks",
+      "DaysPerWeek": 4,
+      "TimePerWorkout": "60-75 minutes",
+      "EquipmentRequired": "Full Gym",
+      "TargetGender": "Both"
+    },
+    "workout_plan": [
+      {
+        "heading": "Day 1: Upper Body",
+        "day_plan": "## Exercises\n\n1. **Barbell Bench Press** - 4 sets x 8-10 reps\n2. **Barbell Rows** - 4 sets x 8-10 reps\n3. **Overhead Press** - 3 sets x 10-12 reps\n4. **Pull-ups** - 3 sets x 8-12 reps\n5. **Dumbbell Curls** - 3 sets x 12-15 reps\n6. **Tricep Dips** - 3 sets x 10-12 reps"
+      },
+      {
+        "heading": "Day 2: Lower Body",
+        "day_plan": "## Exercises\n\n1. **Barbell Squat** - 4 sets x 8-10 reps\n2. **Romanian Deadlift** - 4 sets x 8-10 reps\n3. **Leg Press** - 3 sets x 12-15 reps\n4. **Leg Curls** - 3 sets x 12-15 reps\n5. **Calf Raises** - 4 sets x 15-20 reps"
+      }
+    ]
+  }
+}
+```
+
+## Browsing routines
+
+### Routines library
+
+The main routines page (`/routines`) displays:
+- Grid layout with routine cards (9 per page)
+- Pagination for browsing all 600+ routines
+- Responsive design adapting to screen size
+- Loading states during data fetch
+
+### Category browsing
+
+Find routines by category:
+- Click category tags on routine detail pages
+- Browse routines sharing the same category
+- Discover similar programs matching your goals
+
+<Warning>
+  Always consult with a healthcare professional before starting a new workout routine, especially if you have any pre-existing medical conditions or injuries.
+</Warning>
+
+## Building your program
+
+Routines provide complete structure, but you can customize them:
+
+1. **Follow as written**: Execute the program exactly as designed
+2. **Adjust volume**: Modify sets/reps based on recovery
+3. **Substitute exercises**: Replace movements with similar alternatives
+4. **Adapt to equipment**: Use available equipment substitutes
+
+<Card title="Next: Learn about filtering" icon="filter" href="/features/filtering">
+  Discover how to filter exercises by body part, equipment, and target muscles
+</Card>

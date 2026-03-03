@@ -1,0 +1,587 @@
+---
+title: 'Filter Types'
+description: 'TypeScript interfaces for body parts, equipment, and target muscles'
+---
+
+## Overview
+
+The filter types define the structure for exercise filtering options including body parts, equipment, and target muscles. These types enable type-safe filtering and categorization of exercises.
+
+## IBodyPart
+
+Represents a body part category with visual representation.
+
+```typescript types.d.ts
+interface IBodyPart {
+  bodyPart: string;
+  imageUrl: string;
+}
+```
+
+### Properties
+
+<ResponseField name="bodyPart" type="string" required>
+  Name of the body part (e.g., "chest", "back", "legs", "shoulders")
+</ResponseField>
+
+<ResponseField name="imageUrl" type="string" required>
+  Image URL representing the body part for visual selection
+</ResponseField>
+
+## IBodyPartData
+
+Collection of all available body part filters.
+
+```typescript types.d.ts
+interface IBodyPartData {
+  totalBodyParts: number;
+  data: IBodyPart[];
+}
+```
+
+### Properties
+
+<ResponseField name="totalBodyParts" type="number" required>
+  Total count of available body part categories
+</ResponseField>
+
+<ResponseField name="data" type="IBodyPart[]" required>
+  Array of body part objects
+</ResponseField>
+
+## IEquipment
+
+Represents an equipment type with visual representation.
+
+```typescript types.d.ts
+interface IEquipment {
+  equipment: string;
+  imageUrl: string;
+}
+```
+
+### Properties
+
+<ResponseField name="equipment" type="string" required>
+  Name of the equipment (e.g., "barbell", "dumbbell", "bodyweight", "cable")
+</ResponseField>
+
+<ResponseField name="imageUrl" type="string" required>
+  Image URL representing the equipment for visual selection
+</ResponseField>
+
+## IEquipmentData
+
+Collection of all available equipment filters.
+
+```typescript types.d.ts
+interface IEquipmentData {
+  totalEquipments: number;
+  data: IEquipment[];
+}
+```
+
+### Properties
+
+<ResponseField name="totalEquipments" type="number" required>
+  Total count of available equipment types
+</ResponseField>
+
+<ResponseField name="data" type="IEquipment[]" required>
+  Array of equipment objects
+</ResponseField>
+
+## ITargetMuscle
+
+Represents a target muscle with visual representation.
+
+```typescript types.d.ts
+interface ITargetMuscle {
+  targetMuscle: string;
+  imageUrl: string;
+}
+```
+
+### Properties
+
+<ResponseField name="targetMuscle" type="string" required>
+  Name of the target muscle (e.g., "pectorals", "latissimus dorsi", "quadriceps")
+</ResponseField>
+
+<ResponseField name="imageUrl" type="string" required>
+  Image URL representing the target muscle for visual selection
+</ResponseField>
+
+## ITargetMuscleData
+
+Collection of all available target muscle filters.
+
+```typescript types.d.ts
+interface ITargetMuscleData {
+  totalTargetMuscles: number;
+  data: ITargetMuscle[];
+}
+```
+
+### Properties
+
+<ResponseField name="totalTargetMuscles" type="number" required>
+  Total count of available target muscle categories
+</ResponseField>
+
+<ResponseField name="data" type="ITargetMuscle[]" required>
+  Array of target muscle objects
+</ResponseField>
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Fetching Filters">
+    ```typescript
+    import { IBodyPartData, IEquipmentData, ITargetMuscleData } from './types';
+
+    async function getBodyParts(): Promise<IBodyPartData> {
+      const response = await fetch('https://api.bodyworks.io/bodyparts');
+      return response.json();
+    }
+
+    async function getEquipment(): Promise<IEquipmentData> {
+      const response = await fetch('https://api.bodyworks.io/equipment');
+      return response.json();
+    }
+
+    async function getTargetMuscles(): Promise<ITargetMuscleData> {
+      const response = await fetch('https://api.bodyworks.io/targets');
+      return response.json();
+    }
+
+    // Load all filters
+    const [bodyParts, equipment, targetMuscles] = await Promise.all([
+      getBodyParts(),
+      getEquipment(),
+      getTargetMuscles()
+    ]);
+
+    console.log(`Body Parts: ${bodyParts.totalBodyParts}`);
+    console.log(`Equipment: ${equipment.totalEquipments}`);
+    console.log(`Target Muscles: ${targetMuscles.totalTargetMuscles}`);
+    ```
+  </Tab>
+
+  <Tab title="Combined Filters">
+    ```typescript
+    import {
+      IBodyPartData,
+      IEquipmentData,
+      ITargetMuscleData,
+      IExerciseData
+    } from './types';
+
+    interface ExerciseFilters {
+      bodyPart?: string;
+      equipment?: string;
+      targetMuscle?: string;
+    }
+
+    async function getExercisesWithFilters(
+      filters: ExerciseFilters
+    ): Promise<IExerciseData> {
+      const params = new URLSearchParams();
+      
+      if (filters.bodyPart) params.append('bodyPart', filters.bodyPart);
+      if (filters.equipment) params.append('equipment', filters.equipment);
+      if (filters.targetMuscle) params.append('target', filters.targetMuscle);
+      
+      const response = await fetch(
+        `https://api.bodyworks.io/exercises?${params}`
+      );
+      return response.json();
+    }
+
+    // Usage
+    const exercises = await getExercisesWithFilters({
+      bodyPart: 'chest',
+      equipment: 'barbell'
+    });
+    ```
+  </Tab>
+
+  <Tab title="Filter Component">
+    ```typescript
+    import React, { useState, useEffect } from 'react';
+    import {
+      IBodyPart,
+      IEquipment,
+      ITargetMuscle,
+      IBodyPartData,
+      IEquipmentData,
+      ITargetMuscleData
+    } from './types';
+
+    interface FilterSelectorProps {
+      onFilterChange: (filters: {
+        bodyPart?: string;
+        equipment?: string;
+        target?: string;
+      }) => void;
+    }
+
+    export const FilterSelector: React.FC<FilterSelectorProps> = ({
+      onFilterChange
+    }) => {
+      const [bodyParts, setBodyParts] = useState<IBodyPart[]>([]);
+      const [equipment, setEquipment] = useState<IEquipment[]>([]);
+      const [targetMuscles, setTargetMuscles] = useState<ITargetMuscle[]>([]);
+      
+      const [selectedBodyPart, setSelectedBodyPart] = useState<string>('');
+      const [selectedEquipment, setSelectedEquipment] = useState<string>('');
+      const [selectedTarget, setSelectedTarget] = useState<string>('');
+
+      useEffect(() => {
+        async function loadFilters() {
+          const [bodyPartData, equipmentData, targetData] = await Promise.all([
+            fetch('https://api.bodyworks.io/bodyparts').then(r => r.json()),
+            fetch('https://api.bodyworks.io/equipment').then(r => r.json()),
+            fetch('https://api.bodyworks.io/targets').then(r => r.json())
+          ]) as [IBodyPartData, IEquipmentData, ITargetMuscleData];
+          
+          setBodyParts(bodyPartData.data);
+          setEquipment(equipmentData.data);
+          setTargetMuscles(targetData.data);
+        }
+
+        loadFilters();
+      }, []);
+
+      useEffect(() => {
+        onFilterChange({
+          bodyPart: selectedBodyPart || undefined,
+          equipment: selectedEquipment || undefined,
+          target: selectedTarget || undefined
+        });
+      }, [selectedBodyPart, selectedEquipment, selectedTarget]);
+
+      return (
+        <div className="filter-selector">
+          <div className="filter-group">
+            <h3>Body Part</h3>
+            <select
+              value={selectedBodyPart}
+              onChange={(e) => setSelectedBodyPart(e.target.value)}
+            >
+              <option value="">All</option>
+              {bodyParts.map((bp) => (
+                <option key={bp.bodyPart} value={bp.bodyPart}>
+                  {bp.bodyPart}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <h3>Equipment</h3>
+            <select
+              value={selectedEquipment}
+              onChange={(e) => setSelectedEquipment(e.target.value)}
+            >
+              <option value="">All</option>
+              {equipment.map((eq) => (
+                <option key={eq.equipment} value={eq.equipment}>
+                  {eq.equipment}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <h3>Target Muscle</h3>
+            <select
+              value={selectedTarget}
+              onChange={(e) => setSelectedTarget(e.target.value)}
+            >
+              <option value="">All</option>
+              {targetMuscles.map((tm) => (
+                <option key={tm.targetMuscle} value={tm.targetMuscle}>
+                  {tm.targetMuscle}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      );
+    };
+    ```
+  </Tab>
+
+  <Tab title="Visual Filter Grid">
+    ```typescript
+    import React from 'react';
+    import { IBodyPart, IEquipment, ITargetMuscle } from './types';
+
+    interface FilterGridProps<T> {
+      items: T[];
+      selectedItem?: string;
+      onSelect: (item: string) => void;
+      getLabel: (item: T) => string;
+      getImage: (item: T) => string;
+    }
+
+    function FilterGrid<T>({
+      items,
+      selectedItem,
+      onSelect,
+      getLabel,
+      getImage
+    }: FilterGridProps<T>) {
+      return (
+        <div className="filter-grid">
+          {items.map((item, index) => {
+            const label = getLabel(item);
+            const image = getImage(item);
+            const isSelected = selectedItem === label;
+            
+            return (
+              <div
+                key={index}
+                className={`filter-card ${isSelected ? 'selected' : ''}`}
+                onClick={() => onSelect(label)}
+              >
+                <img src={image} alt={label} />
+                <span>{label}</span>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // Usage with different filter types
+    export const BodyPartFilter: React.FC<{
+      bodyParts: IBodyPart[];
+      selected?: string;
+      onSelect: (bodyPart: string) => void;
+    }> = ({ bodyParts, selected, onSelect }) => (
+      <FilterGrid
+        items={bodyParts}
+        selectedItem={selected}
+        onSelect={onSelect}
+        getLabel={(bp) => bp.bodyPart}
+        getImage={(bp) => bp.imageUrl}
+      />
+    );
+
+    export const EquipmentFilter: React.FC<{
+      equipment: IEquipment[];
+      selected?: string;
+      onSelect: (equipment: string) => void;
+    }> = ({ equipment, selected, onSelect }) => (
+      <FilterGrid
+        items={equipment}
+        selectedItem={selected}
+        onSelect={onSelect}
+        getLabel={(eq) => eq.equipment}
+        getImage={(eq) => eq.imageUrl}
+      />
+    );
+    ```
+  </Tab>
+
+  <Tab title="Filter State Management">
+    ```typescript
+    import { IBodyPart, IEquipment, ITargetMuscle } from './types';
+
+    interface FilterState {
+      bodyParts: IBodyPart[];
+      equipment: IEquipment[];
+      targetMuscles: ITargetMuscle[];
+      selected: {
+        bodyPart?: string;
+        equipment?: string;
+        targetMuscle?: string;
+      };
+    }
+
+    type FilterAction =
+      | { type: 'SET_BODY_PARTS'; payload: IBodyPart[] }
+      | { type: 'SET_EQUIPMENT'; payload: IEquipment[] }
+      | { type: 'SET_TARGET_MUSCLES'; payload: ITargetMuscle[] }
+      | { type: 'SELECT_BODY_PART'; payload: string }
+      | { type: 'SELECT_EQUIPMENT'; payload: string }
+      | { type: 'SELECT_TARGET_MUSCLE'; payload: string }
+      | { type: 'CLEAR_FILTERS' };
+
+    function filterReducer(
+      state: FilterState,
+      action: FilterAction
+    ): FilterState {
+      switch (action.type) {
+        case 'SET_BODY_PARTS':
+          return { ...state, bodyParts: action.payload };
+        case 'SET_EQUIPMENT':
+          return { ...state, equipment: action.payload };
+        case 'SET_TARGET_MUSCLES':
+          return { ...state, targetMuscles: action.payload };
+        case 'SELECT_BODY_PART':
+          return {
+            ...state,
+            selected: { ...state.selected, bodyPart: action.payload }
+          };
+        case 'SELECT_EQUIPMENT':
+          return {
+            ...state,
+            selected: { ...state.selected, equipment: action.payload }
+          };
+        case 'SELECT_TARGET_MUSCLE':
+          return {
+            ...state,
+            selected: { ...state.selected, targetMuscle: action.payload }
+          };
+        case 'CLEAR_FILTERS':
+          return {
+            ...state,
+            selected: {}
+          };
+        default:
+          return state;
+      }
+    }
+
+    // Hook for using filters
+    import { useReducer, useEffect } from 'react';
+
+    export function useFilters() {
+      const [state, dispatch] = useReducer(filterReducer, {
+        bodyParts: [],
+        equipment: [],
+        targetMuscles: [],
+        selected: {}
+      });
+
+      useEffect(() => {
+        async function loadFilters() {
+          const [bodyParts, equipment, targetMuscles] = await Promise.all([
+            fetch('https://api.bodyworks.io/bodyparts').then(r => r.json()),
+            fetch('https://api.bodyworks.io/equipment').then(r => r.json()),
+            fetch('https://api.bodyworks.io/targets').then(r => r.json())
+          ]);
+
+          dispatch({ type: 'SET_BODY_PARTS', payload: bodyParts.data });
+          dispatch({ type: 'SET_EQUIPMENT', payload: equipment.data });
+          dispatch({ type: 'SET_TARGET_MUSCLES', payload: targetMuscles.data });
+        }
+
+        loadFilters();
+      }, []);
+
+      return { state, dispatch };
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## How Filter Types Work Together
+
+The filter types are designed to work together to provide a comprehensive exercise filtering system:
+
+```typescript
+import {
+  IBodyPartData,
+  IEquipmentData,
+  ITargetMuscleData,
+  IExerciseData,
+  IExercise
+} from './types';
+
+class ExerciseFilterService {
+  private bodyParts: IBodyPartData | null = null;
+  private equipment: IEquipmentData | null = null;
+  private targetMuscles: ITargetMuscleData | null = null;
+
+  async initialize() {
+    [this.bodyParts, this.equipment, this.targetMuscles] = await Promise.all([
+      fetch('https://api.bodyworks.io/bodyparts').then(r => r.json()),
+      fetch('https://api.bodyworks.io/equipment').then(r => r.json()),
+      fetch('https://api.bodyworks.io/targets').then(r => r.json())
+    ]);
+  }
+
+  getAvailableBodyParts(): string[] {
+    return this.bodyParts?.data.map(bp => bp.bodyPart) || [];
+  }
+
+  getAvailableEquipment(): string[] {
+    return this.equipment?.data.map(eq => eq.equipment) || [];
+  }
+
+  getAvailableTargets(): string[] {
+    return this.targetMuscles?.data.map(tm => tm.targetMuscle) || [];
+  }
+
+  async searchExercises(filters: {
+    bodyPart?: string;
+    equipment?: string;
+    target?: string;
+  }): Promise<IExercise[]> {
+    const params = new URLSearchParams();
+    if (filters.bodyPart) params.append('bodyPart', filters.bodyPart);
+    if (filters.equipment) params.append('equipment', filters.equipment);
+    if (filters.target) params.append('target', filters.target);
+
+    const response = await fetch(
+      `https://api.bodyworks.io/exercises?${params}`
+    );
+    const data: IExerciseData = await response.json();
+    return data.data;
+  }
+
+  getFilterImage(type: 'bodyPart' | 'equipment' | 'target', value: string): string | undefined {
+    switch (type) {
+      case 'bodyPart':
+        return this.bodyParts?.data.find(bp => bp.bodyPart === value)?.imageUrl;
+      case 'equipment':
+        return this.equipment?.data.find(eq => eq.equipment === value)?.imageUrl;
+      case 'target':
+        return this.targetMuscles?.data.find(tm => tm.targetMuscle === value)?.imageUrl;
+    }
+  }
+}
+
+// Usage
+const filterService = new ExerciseFilterService();
+await filterService.initialize();
+
+const chestExercises = await filterService.searchExercises({
+  bodyPart: 'chest',
+  equipment: 'dumbbell'
+});
+```
+
+## Type Guards
+
+Create type guards to safely validate filter data:
+
+```typescript
+function isBodyPart(obj: any): obj is IBodyPart {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.bodyPart === 'string' &&
+    typeof obj.imageUrl === 'string'
+  );
+}
+
+function isEquipment(obj: any): obj is IEquipment {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.equipment === 'string' &&
+    typeof obj.imageUrl === 'string'
+  );
+}
+
+function isTargetMuscle(obj: any): obj is ITargetMuscle {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.targetMuscle === 'string' &&
+    typeof obj.imageUrl === 'string'
+  );
+}
+```

@@ -1,0 +1,216 @@
+---
+title: 'Get Exercises'
+api: 'GET /exercises'
+description: 'Retrieve a paginated list of exercises with filtering options'
+---
+
+## Endpoint
+
+```
+GET /api/exercises
+```
+
+Retrieve a paginated list of exercises from the BodyWorks database. This endpoint supports pagination to efficiently load large sets of exercise data.
+
+## Query Parameters
+
+<ParamField query="limit" type="number" default="9">
+  The number of exercises to return per page. Controls pagination size.
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  The page number to retrieve. Used for pagination through the exercise list.
+</ParamField>
+
+## Response
+
+<ResponseField name="totalExercises" type="number">
+  The total number of exercises available in the database.
+</ResponseField>
+
+<ResponseField name="totalPages" type="number">
+  The total number of pages available based on the limit parameter.
+</ResponseField>
+
+<ResponseField name="data" type="IExercise[]">
+  An array of exercise objects.
+  
+  <Expandable title="Exercise Object">
+    <ResponseField name="name" type="string">
+      The unique identifier name of the exercise.
+    </ResponseField>
+    
+    <ResponseField name="title" type="string">
+      The display title of the exercise.
+    </ResponseField>
+    
+    <ResponseField name="target" type="string">
+      The primary target muscle or muscle group.
+    </ResponseField>
+    
+    <ResponseField name="muscles_worked" type="string">
+      Description of all muscles worked during the exercise.
+    </ResponseField>
+    
+    <ResponseField name="bodyPart" type="string">
+      The body part category (e.g., "chest", "legs", "back").
+    </ResponseField>
+    
+    <ResponseField name="equipment" type="string">
+      The equipment required for this exercise.
+    </ResponseField>
+    
+    <ResponseField name="id" type="string">
+      The unique identifier for the exercise.
+    </ResponseField>
+    
+    <ResponseField name="id_" type="string">
+      Alternative identifier for the exercise.
+    </ResponseField>
+    
+    <ResponseField name="blog" type="string">
+      URL or content for related blog post about the exercise.
+    </ResponseField>
+    
+    <ResponseField name="images" type="string[]">
+      Array of image URLs showing the exercise.
+    </ResponseField>
+    
+    <ResponseField name="gifUrl" type="string">
+      URL to an animated GIF demonstrating the exercise.
+    </ResponseField>
+    
+    <ResponseField name="videos" type="string[]">
+      Array of video URLs demonstrating the exercise.
+    </ResponseField>
+    
+    <ResponseField name="keywords" type="string[]">
+      Array of keywords associated with the exercise for search and filtering.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Request
+
+<Tabs>
+  <Tab title="cURL">
+    ```bash
+    curl -X GET "https://api.bodyworks.com/api/exercises?limit=10&page=1"
+    ```
+  </Tab>
+  
+  <Tab title="axios">
+    ```javascript
+    import axios from 'axios';
+
+    const getExercises = async (limit = 10, page = 1) => {
+      const response = await axios.get('/api/exercises', {
+        params: {
+          limit,
+          page
+        }
+      });
+      return response.data;
+    };
+
+    // Usage
+    const exercises = await getExercises(10, 1);
+    ```
+  </Tab>
+  
+  <Tab title="fetch">
+    ```javascript
+    const getExercises = async (limit = 10, page = 1) => {
+      const response = await fetch(
+        `/api/exercises?limit=${limit}&page=${page}`
+      );
+      const data = await response.json();
+      return data;
+    };
+
+    // Usage
+    const exercises = await getExercises(10, 1);
+    ```
+  </Tab>
+</Tabs>
+
+## Example Response
+
+```json
+{
+  "totalExercises": 1324,
+  "totalPages": 133,
+  "data": [
+    {
+      "name": "barbell-bench-press",
+      "title": "Barbell Bench Press",
+      "target": "pectorals",
+      "muscles_worked": "chest, triceps, shoulders",
+      "bodyPart": "chest",
+      "equipment": "barbell",
+      "id": "ex_001",
+      "id_": "001",
+      "blog": "https://bodyworks.com/blog/bench-press-guide",
+      "images": [
+        "https://cdn.bodyworks.com/exercises/bench-press-1.jpg",
+        "https://cdn.bodyworks.com/exercises/bench-press-2.jpg"
+      ],
+      "gifUrl": "https://cdn.bodyworks.com/exercises/bench-press.gif",
+      "videos": [
+        "https://youtube.com/watch?v=example1"
+      ],
+      "keywords": [
+        "chest",
+        "barbell",
+        "compound",
+        "strength"
+      ]
+    },
+    {
+      "name": "squat",
+      "title": "Barbell Squat",
+      "target": "quadriceps",
+      "muscles_worked": "quads, glutes, hamstrings, core",
+      "bodyPart": "legs",
+      "equipment": "barbell",
+      "id": "ex_002",
+      "id_": "002",
+      "blog": "https://bodyworks.com/blog/squat-guide",
+      "images": [
+        "https://cdn.bodyworks.com/exercises/squat-1.jpg",
+        "https://cdn.bodyworks.com/exercises/squat-2.jpg"
+      ],
+      "gifUrl": "https://cdn.bodyworks.com/exercises/squat.gif",
+      "videos": [
+        "https://youtube.com/watch?v=example2"
+      ],
+      "keywords": [
+        "legs",
+        "barbell",
+        "compound",
+        "strength"
+      ]
+    }
+  ]
+}
+```
+
+## Error Responses
+
+<ResponseField name="400 Bad Request">
+  ```json
+  {
+    "error": "Invalid pagination parameters",
+    "message": "Limit and page must be positive integers"
+  }
+  ```
+</ResponseField>
+
+<ResponseField name="500 Internal Server Error">
+  ```json
+  {
+    "error": "Internal server error",
+    "message": "Failed to fetch exercises from database"
+  }
+  ```
+</ResponseField>

@@ -1,0 +1,372 @@
+---
+title: useExercises
+description: React hook for fetching paginated exercise data with automatic caching and state management
+---
+
+## Overview
+
+`useExercises` is a custom React hook built on React Query that fetches paginated exercise data from the BodyWorks API. It provides automatic caching, loading states, error handling, and seamless pagination with placeholder data support.
+
+## Hook Signature
+
+```typescript
+const useExercises = (
+  limit: number = 9,
+  page: number = 1
+) => {
+  const {
+    isLoading,
+    data: exercises,
+    error,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["exercises", limit, page],
+    queryFn: () => getExercises(limit, page),
+    placeholderData: keepPreviousData,
+  });
+  return { isLoading, exercises, error, refetch, isRefetching };
+};
+```
+
+## Parameters
+
+<ParamField path="limit" type="number" default="9">
+  The number of exercises to fetch per page. Controls the pagination size.
+</ParamField>
+
+<ParamField path="page" type="number" default="1">
+  The page number to fetch. Must be a positive integer starting from 1.
+</ParamField>
+
+## Return Values
+
+The hook returns an object with the following properties:
+
+<ResponseField name="isLoading" type="boolean">
+  Indicates whether the initial data is being loaded. `true` during the first fetch, `false` once data is available or an error occurs.
+</ResponseField>
+
+<ResponseField name="exercises" type="IExerciseData | undefined">
+  The fetched exercise data object containing:
+  - `totalExercises` (number): Total number of exercises available
+  - `totalPages` (number): Total number of pages based on the limit
+  - `data` (IExercise[]): Array of exercise objects
+</ResponseField>
+
+<ResponseField name="error" type="Error | null">
+  Contains error information if the request fails, otherwise `null`.
+</ResponseField>
+
+<ResponseField name="refetch" type="() => Promise<QueryObserverResult>">
+  Function to manually refetch the exercise data. Useful for implementing refresh functionality.
+</ResponseField>
+
+<ResponseField name="isRefetching" type="boolean">
+  Indicates whether the data is being refetched. `true` during background updates, `false` otherwise.
+</ResponseField>
+
+## Exercise Data Structure
+
+```typescript
+interface IExercise {
+  name: string;              // Exercise name identifier
+  title: string;             // Display title
+  target: string;            // Target muscle group
+  muscles_worked: string;    // Description of muscles worked
+  bodyPart: string;          // Primary body part
+  equipment: string;         // Required equipment
+  id: string;                // Unique identifier
+  id_: string;               // Alternative identifier
+  blog: string;              // Related blog content
+  images: string[];          // Exercise images
+  gifUrl: string;            // Animated demonstration GIF
+  videos: string[];          // Video tutorials
+  keywords: string[];        // Search keywords
+}
+
+interface IExerciseData {
+  totalExercises: number;
+  totalPages: number;
+  data: IExercise[];
+}
+```
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Basic Usage">
+    ```tsx
+    import useExercises from '@/hooks/useExercises';
+
+    function ExerciseList() {
+      const { isLoading, exercises, error } = useExercises();
+
+      if (isLoading) return <div>Loading exercises...</div>;
+      if (error) return <div>Error: {error.message}</div>;
+
+      return (
+        <div>
+          <h2>Total Exercises: {exercises?.totalExercises}</h2>
+          <div className="grid">
+            {exercises?.data.map((exercise) => (
+              <div key={exercise.id}>
+                <h3>{exercise.title}</h3>
+                <p>Target: {exercise.target}</p>
+                <p>Equipment: {exercise.equipment}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="With Pagination">
+    ```tsx
+    import { useState } from 'react';
+    import useExercises from '@/hooks/useExercises';
+
+    function PaginatedExercises() {
+      const [page, setPage] = useState(1);
+      const limit = 12;
+      const { isLoading, exercises, error, isRefetching } = useExercises(limit, page);
+
+      const handleNextPage = () => {
+        if (exercises && page < exercises.totalPages) {
+          setPage(page + 1);
+        }
+      };
+
+      const handlePrevPage = () => {
+        if (page > 1) {
+          setPage(page - 1);
+        }
+      };
+
+      return (
+        <div>
+          {isRefetching && <div>Updating...</div>}
+          
+          <div className="exercises">
+            {exercises?.data.map((exercise) => (
+              <ExerciseCard key={exercise.id} exercise={exercise} />
+            ))}
+          </div>
+
+          <div className="pagination">
+            <button onClick={handlePrevPage} disabled={page === 1}>
+              Previous
+            </button>
+            <span>Page {page} of {exercises?.totalPages}</span>
+            <button 
+              onClick={handleNextPage} 
+              disabled={page === exercises?.totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="With Refetch">
+    ```tsx
+    import useExercises from '@/hooks/useExercises';
+
+    function ExercisesWithRefresh() {
+      const { isLoading, exercises, error, refetch, isRefetching } = useExercises(10, 1);
+
+      const handleRefresh = async () => {
+        await refetch();
+      };
+
+      return (
+        <div>
+          <div className="header">
+            <h2>Exercise Database</h2>
+            <button 
+              onClick={handleRefresh} 
+              disabled={isRefetching}
+            >
+              {isRefetching ? 'Refreshing...' : 'Refresh'}
+            </button>
+          </div>
+
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : error ? (
+            <ErrorMessage error={error} onRetry={refetch} />
+          ) : (
+            <ExerciseGrid exercises={exercises?.data} />
+          )}
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Custom Page Size">
+    ```tsx
+    import { useState } from 'react';
+    import useExercises from '@/hooks/useExercises';
+
+    function CustomPageSize() {
+      const [page, setPage] = useState(1);
+      const [pageSize, setPageSize] = useState(9);
+      const { isLoading, exercises, error } = useExercises(pageSize, page);
+
+      const handlePageSizeChange = (newSize: number) => {
+        setPageSize(newSize);
+        setPage(1); // Reset to first page
+      };
+
+      return (
+        <div>
+          <div className="controls">
+            <label>Items per page:</label>
+            <select 
+              value={pageSize} 
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+            >
+              <option value={6}>6</option>
+              <option value={9}>9</option>
+              <option value={12}>12</option>
+              <option value={24}>24</option>
+            </select>
+          </div>
+
+          <div className="results">
+            {exercises?.data.map((exercise) => (
+              <ExerciseCard key={exercise.id} exercise={exercise} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## React Query Features
+
+### Automatic Caching
+
+The hook uses React Query's caching mechanism with a query key based on both `limit` and `page` parameters:
+
+```typescript
+queryKey: ["exercises", limit, page]
+```
+
+This ensures that each unique combination of pagination parameters is cached separately, reducing unnecessary API calls.
+
+### Placeholder Data
+
+The hook uses `keepPreviousData` to maintain smooth pagination:
+
+```typescript
+placeholderData: keepPreviousData
+```
+
+<Note>
+  With `keepPreviousData`, when navigating between pages, the previous page's data remains visible until the new data loads. This prevents layout shifts and provides a better user experience.
+</Note>
+
+### Background Refetching
+
+React Query automatically refetches data in the background when:
+- The window regains focus
+- The network reconnects
+- A refetch interval is configured (not set by default)
+
+Use the `isRefetching` flag to show loading indicators during background updates without hiding the current data.
+
+## Best Practices
+
+<Tip>
+  **Optimize pagination**: Choose a `limit` value that balances performance with user experience. Typical values range from 9-24 items per page.
+</Tip>
+
+<Tip>
+  **Handle loading states**: Always check `isLoading` before accessing `exercises?.data` to prevent runtime errors.
+</Tip>
+
+<Tip>
+  **Error boundaries**: Wrap components using this hook in error boundaries to gracefully handle API failures.
+</Tip>
+
+<Tip>
+  **Prefetch next page**: For better UX, consider prefetching the next page when users reach the bottom of the current page using React Query's `prefetchQuery`.
+</Tip>
+
+<Note>
+  The hook returns `undefined` for `exercises` during the initial load. Always use optional chaining (`exercises?.data`) when accessing nested properties.
+</Note>
+
+## Common Patterns
+
+### Loading States
+
+```tsx
+const { isLoading, exercises, isRefetching } = useExercises();
+
+if (isLoading) {
+  return <LoadingSpinner />; // Initial load
+}
+
+return (
+  <div>
+    {isRefetching && <RefreshIndicator />} {/* Background update */}
+    {/* Content */}
+  </div>
+);
+```
+
+### Error Handling
+
+```tsx
+const { error, refetch } = useExercises();
+
+if (error) {
+  return (
+    <div>
+      <p>Failed to load exercises: {error.message}</p>
+      <button onClick={() => refetch()}>Try Again</button>
+    </div>
+  );
+}
+```
+
+### Infinite Scroll
+
+```tsx
+function InfiniteExercises() {
+  const [page, setPage] = useState(1);
+  const [allExercises, setAllExercises] = useState<IExercise[]>([]);
+  const { exercises, isLoading } = useExercises(12, page);
+
+  useEffect(() => {
+    if (exercises?.data) {
+      setAllExercises(prev => [...prev, ...exercises.data]);
+    }
+  }, [exercises]);
+
+  const loadMore = () => setPage(prev => prev + 1);
+
+  return (
+    <div>
+      {allExercises.map(exercise => (
+        <ExerciseCard key={exercise.id} exercise={exercise} />
+      ))}
+      {page < (exercises?.totalPages || 0) && (
+        <button onClick={loadMore} disabled={isLoading}>
+          Load More
+        </button>
+      )}
+    </div>
+  );
+}
+```

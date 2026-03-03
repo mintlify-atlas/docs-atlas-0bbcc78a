@@ -1,0 +1,380 @@
+---
+title: useBodyParts
+description: React hook for fetching body part data with optional limit and automatic caching
+---
+
+## Overview
+
+`useBodyParts` is a custom React hook built on React Query that fetches body part data from the BodyWorks API. Unlike pagination-focused hooks, this hook supports an optional limit parameter for controlling the number of results, making it ideal for dropdowns, filters, and reference data.
+
+## Hook Signature
+
+```typescript
+export const useBodyParts = (
+  limit?: number
+) => {
+  const {
+    isLoading,
+    data: bodyParts,
+    error,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["body-parts", limit],
+    queryFn: () => getBodyParts(limit),
+    placeholderData: keepPreviousData,
+  });
+  return { isLoading, bodyParts, error, isRefetching, refetch };
+};
+```
+
+## Parameters
+
+<ParamField path="limit" type="number" optional>
+  Optional limit on the number of body parts to fetch. When omitted, returns all available body parts.
+</ParamField>
+
+<Note>
+  The `limit` parameter is optional. Call `useBodyParts()` without arguments to fetch all body parts, or specify a number to limit results.
+</Note>
+
+## Return Values
+
+The hook returns an object with the following properties:
+
+<ResponseField name="isLoading" type="boolean">
+  Indicates whether the initial data is being loaded. `true` during the first fetch, `false` once data is available or an error occurs.
+</ResponseField>
+
+<ResponseField name="bodyParts" type="IBodyPartData | undefined">
+  The fetched body part data object containing:
+  - `totalBodyParts` (number): Total number of body parts available
+  - `data` (IBodyPart[]): Array of body part objects
+</ResponseField>
+
+<ResponseField name="error" type="Error | null">
+  Contains error information if the request fails, otherwise `null`.
+</ResponseField>
+
+<ResponseField name="isRefetching" type="boolean">
+  Indicates whether the data is being refetched. `true` during background updates, `false` otherwise.
+</ResponseField>
+
+<ResponseField name="refetch" type="() => Promise<QueryObserverResult>">
+  Function to manually refetch the body part data.
+</ResponseField>
+
+## Body Part Data Structure
+
+```typescript
+interface IBodyPart {
+  bodyPart: string;     // Body part name (e.g., "chest", "back", "legs")
+  imageUrl: string;     // Image URL for the body part
+}
+
+interface IBodyPartData {
+  totalBodyParts: number;
+  data: IBodyPart[];
+}
+```
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Basic Usage">
+    ```tsx
+    import { useBodyParts } from '@/hooks/useBodyParts';
+
+    function BodyPartList() {
+      const { isLoading, bodyParts, error } = useBodyParts();
+
+      if (isLoading) return <div>Loading body parts...</div>;
+      if (error) return <div>Error: {error.message}</div>;
+
+      return (
+        <div>
+          <h2>Body Parts ({bodyParts?.totalBodyParts})</h2>
+          <div className="body-parts-grid">
+            {bodyParts?.data.map((bodyPart) => (
+              <div key={bodyPart.bodyPart} className="body-part-card">
+                <img src={bodyPart.imageUrl} alt={bodyPart.bodyPart} />
+                <h3>{bodyPart.bodyPart}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Filter Dropdown">
+    ```tsx
+    import { useBodyParts } from '@/hooks/useBodyParts';
+
+    function BodyPartFilter({ onSelect }: { onSelect: (bodyPart: string) => void }) {
+      const { isLoading, bodyParts } = useBodyParts();
+
+      return (
+        <select 
+          onChange={(e) => onSelect(e.target.value)}
+          disabled={isLoading}
+        >
+          <option value="">All Body Parts</option>
+          {bodyParts?.data.map((bodyPart) => (
+            <option key={bodyPart.bodyPart} value={bodyPart.bodyPart}>
+              {bodyPart.bodyPart.charAt(0).toUpperCase() + bodyPart.bodyPart.slice(1)}
+            </option>
+          ))}
+        </select>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="With Limit">
+    ```tsx
+    import { useBodyParts } from '@/hooks/useBodyParts';
+
+    function PopularBodyParts() {
+      // Fetch only the first 6 body parts
+      const { isLoading, bodyParts, error } = useBodyParts(6);
+
+      return (
+        <div>
+          <h3>Popular Body Parts</h3>
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : error ? (
+            <div>Error loading body parts</div>
+          ) : (
+            <div className="grid">
+              {bodyParts?.data.map((bodyPart) => (
+                <button 
+                  key={bodyPart.bodyPart}
+                  className="body-part-button"
+                >
+                  <img src={bodyPart.imageUrl} alt={bodyPart.bodyPart} />
+                  <span>{bodyPart.bodyPart}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Multi-Select">
+    ```tsx
+    import { useState } from 'react';
+    import { useBodyParts } from '@/hooks/useBodyParts';
+
+    function BodyPartMultiSelect() {
+      const [selected, setSelected] = useState<string[]>([]);
+      const { bodyParts, isLoading } = useBodyParts();
+
+      const toggleBodyPart = (bodyPart: string) => {
+        setSelected(prev => 
+          prev.includes(bodyPart)
+            ? prev.filter(bp => bp !== bodyPart)
+            : [...prev, bodyPart]
+        );
+      };
+
+      return (
+        <div>
+          <h3>Select Body Parts</h3>
+          <div className="checkbox-group">
+            {bodyParts?.data.map((bodyPart) => (
+              <label key={bodyPart.bodyPart}>
+                <input
+                  type="checkbox"
+                  checked={selected.includes(bodyPart.bodyPart)}
+                  onChange={() => toggleBodyPart(bodyPart.bodyPart)}
+                />
+                <img 
+                  src={bodyPart.imageUrl} 
+                  alt={bodyPart.bodyPart}
+                  className="thumbnail"
+                />
+                <span>{bodyPart.bodyPart}</span>
+              </label>
+            ))}
+          </div>
+          <p>Selected: {selected.join(', ')}</p>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## React Query Features
+
+### Automatic Caching
+
+The hook uses React Query's caching with a query key based on the `limit` parameter:
+
+```typescript
+queryKey: ["body-parts", limit]
+```
+
+Different limits create separate cache entries:
+- `useBodyParts()` caches all body parts
+- `useBodyParts(6)` caches the first 6 body parts
+- Both can coexist without conflicts
+
+### Placeholder Data
+
+```typescript
+placeholderData: keepPreviousData
+```
+
+Maintains previous data while new data loads, useful when switching between different limit values.
+
+### Stale Time Configuration
+
+For relatively static reference data like body parts, you can configure longer stale times:
+
+```tsx
+import { useQuery } from '@tanstack/react-query';
+
+const { bodyParts } = useBodyParts();
+
+// Customize in your own wrapper:
+const useBodyPartsWithConfig = (limit?: number) => {
+  return useQuery({
+    queryKey: ["body-parts", limit],
+    queryFn: () => getBodyParts(limit),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+```
+
+## Best Practices
+
+<Tip>
+  **Use without limit for filters**: When building filter UIs, fetch all body parts by calling `useBodyParts()` without arguments to ensure users can see all available options.
+</Tip>
+
+<Tip>
+  **Use with limit for previews**: When displaying a preview or featured section, use a small limit (e.g., 4-8) to reduce payload size and improve performance.
+</Tip>
+
+<Tip>
+  **Capitalize display names**: Body part names are stored in lowercase. Use text transformation for better UI presentation:
+  ```tsx
+  {bodyPart.bodyPart.charAt(0).toUpperCase() + bodyPart.bodyPart.slice(1)}
+  ```
+</Tip>
+
+<Tip>
+  **Optimize images**: Body part images should be optimized and lazy-loaded, especially when displaying all body parts at once.
+</Tip>
+
+<Note>
+  Body parts are reference data that typically don't change frequently. Consider implementing longer cache times to reduce API calls.
+</Note>
+
+## Common Patterns
+
+### Icon Grid
+
+```tsx
+function BodyPartGrid() {
+  const { bodyParts } = useBodyParts();
+  const navigate = useNavigate();
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {bodyParts?.data.map((bodyPart) => (
+        <button
+          key={bodyPart.bodyPart}
+          onClick={() => navigate(`/exercises?bodyPart=${bodyPart.bodyPart}`)}
+          className="flex flex-col items-center p-4 hover:bg-gray-100"
+        >
+          <img 
+            src={bodyPart.imageUrl} 
+            alt={bodyPart.bodyPart}
+            className="w-16 h-16 object-contain"
+          />
+          <span className="mt-2 text-sm font-medium">
+            {bodyPart.bodyPart}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+```
+
+### Combo with Exercises
+
+```tsx
+import { useState } from 'react';
+import { useBodyParts } from '@/hooks/useBodyParts';
+import useExercises from '@/hooks/useExercises';
+
+function ExercisesByBodyPart() {
+  const [selectedBodyPart, setSelectedBodyPart] = useState<string | null>(null);
+  const { bodyParts } = useBodyParts();
+  const { exercises } = useExercises(12, 1);
+
+  const filteredExercises = exercises?.data.filter(exercise => 
+    !selectedBodyPart || exercise.bodyPart === selectedBodyPart
+  );
+
+  return (
+    <div>
+      <div className="filters">
+        <button onClick={() => setSelectedBodyPart(null)}>All</button>
+        {bodyParts?.data.map(bodyPart => (
+          <button
+            key={bodyPart.bodyPart}
+            onClick={() => setSelectedBodyPart(bodyPart.bodyPart)}
+            className={selectedBodyPart === bodyPart.bodyPart ? 'active' : ''}
+          >
+            {bodyPart.bodyPart}
+          </button>
+        ))}
+      </div>
+
+      <div className="exercises">
+        {filteredExercises?.map(exercise => (
+          <ExerciseCard key={exercise.id} exercise={exercise} />
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+### Loading State
+
+```tsx
+function BodyPartSelector() {
+  const { isLoading, bodyParts, error } = useBodyParts();
+
+  if (error) {
+    return <div className="error">Failed to load body parts</div>;
+  }
+
+  return (
+    <div className="selector">
+      {isLoading ? (
+        // Show skeleton loaders
+        Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="skeleton" />
+        ))
+      ) : (
+        bodyParts?.data.map(bodyPart => (
+          <BodyPartCard key={bodyPart.bodyPart} bodyPart={bodyPart} />
+        ))
+      )}
+    </div>
+  );
+}
+```

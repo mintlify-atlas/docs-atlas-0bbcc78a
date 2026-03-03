@@ -1,0 +1,471 @@
+---
+title: useRoutines
+description: React hook for fetching paginated workout routine data with caching and state management
+---
+
+## Overview
+
+`useRoutines` is a custom React hook built on React Query that fetches paginated workout routine data from the BodyWorks API. It provides automatic caching, loading states, error handling, and seamless pagination with placeholder data support.
+
+## Hook Signature
+
+```typescript
+export const useRoutines = (
+  limit: number,
+  page: number
+) => {
+  const {
+    isLoading,
+    data: routines,
+    error,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["routines", limit, page],
+    queryFn: () => getRoutines(limit, page),
+    placeholderData: keepPreviousData,
+  });
+  return { isLoading, routines, error, refetch, isRefetching };
+};
+```
+
+## Parameters
+
+<ParamField path="limit" type="number" required>
+  The number of routines to fetch per page. Controls the pagination size.
+</ParamField>
+
+<ParamField path="page" type="number" required>
+  The page number to fetch. Must be a positive integer starting from 1.
+</ParamField>
+
+<Note>
+  Unlike `useExercises`, both parameters are required and have no default values. You must explicitly specify the pagination parameters.
+</Note>
+
+## Return Values
+
+The hook returns an object with the following properties:
+
+<ResponseField name="isLoading" type="boolean">
+  Indicates whether the initial data is being loaded. `true` during the first fetch, `false` once data is available or an error occurs.
+</ResponseField>
+
+<ResponseField name="routines" type="IRoutinesResponse | undefined">
+  The fetched routine data object containing:
+  - `totalRoutines` (number): Total number of routines available
+  - `totalPages` (number): Total number of pages based on the limit
+  - `data` (IRoutine[]): Array of routine objects
+</ResponseField>
+
+<ResponseField name="error" type="Error | null">
+  Contains error information if the request fails, otherwise `null`.
+</ResponseField>
+
+<ResponseField name="refetch" type="() => Promise<QueryObserverResult>">
+  Function to manually refetch the routine data. Useful for implementing refresh functionality.
+</ResponseField>
+
+<ResponseField name="isRefetching" type="boolean">
+  Indicates whether the data is being refetched. `true` during background updates, `false` otherwise.
+</ResponseField>
+
+## Routine Data Structure
+
+```typescript
+interface IRoutine {
+  category: string[];        // Routine categories
+  routine: {
+    routine_title: string;
+    routine_description: string;
+    routine_imageUrl: string;
+    workout_plan: {
+      heading: string;
+      day_plan: string;
+    }[];
+    workout_summary: {
+      MainGoal: string;
+      WorkoutType: string;
+      TrainingLevel: string;
+      ProgramDuration: string;
+      DaysPerWeek: number;
+      TimePerWorkout: string;
+      EquipmentRequired: string;
+      TargetGender: string;
+    };
+  };
+  id_: number;
+  id: number;
+}
+
+interface IRoutinesResponse {
+  totalPages: number;
+  totalRoutines: number;
+  data: IRoutine[];
+}
+```
+
+## Usage Examples
+
+<Tabs>
+  <Tab title="Basic Usage">
+    ```tsx
+    import { useRoutines } from '@/hooks/useRoutines';
+
+    function RoutineList() {
+      const { isLoading, routines, error } = useRoutines(10, 1);
+
+      if (isLoading) return <div>Loading routines...</div>;
+      if (error) return <div>Error: {error.message}</div>;
+
+      return (
+        <div>
+          <h2>Workout Routines ({routines?.totalRoutines})</h2>
+          <div className="routines-grid">
+            {routines?.data.map((routine) => (
+              <div key={routine.id} className="routine-card">
+                <img 
+                  src={routine.routine.routine_imageUrl} 
+                  alt={routine.routine.routine_title} 
+                />
+                <h3>{routine.routine.routine_title}</h3>
+                <p>{routine.routine.routine_description}</p>
+                <div className="tags">
+                  {routine.category.map(cat => (
+                    <span key={cat}>{cat}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="With Pagination">
+    ```tsx
+    import { useState } from 'react';
+    import { useRoutines } from '@/hooks/useRoutines';
+
+    function PaginatedRoutines() {
+      const [page, setPage] = useState(1);
+      const limit = 8;
+      const { isLoading, routines, error, isRefetching } = useRoutines(limit, page);
+
+      const goToPage = (newPage: number) => {
+        if (newPage >= 1 && newPage <= (routines?.totalPages || 1)) {
+          setPage(newPage);
+        }
+      };
+
+      return (
+        <div>
+          <div className="header">
+            <h1>Workout Routines</h1>
+            {isRefetching && <span className="badge">Updating...</span>}
+          </div>
+
+          {isLoading ? (
+            <RoutinesSkeleton count={limit} />
+          ) : error ? (
+            <ErrorState error={error} />
+          ) : (
+            <>
+              <div className="routines">
+                {routines?.data.map((routine) => (
+                  <RoutineCard key={routine.id} routine={routine} />
+                ))}
+              </div>
+
+              <Pagination
+                currentPage={page}
+                totalPages={routines?.totalPages || 1}
+                onPageChange={goToPage}
+              />
+            </>
+          )}
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="With Filters">
+    ```tsx
+    import { useState } from 'react';
+    import { useRoutines } from '@/hooks/useRoutines';
+
+    function FilteredRoutines() {
+      const [page, setPage] = useState(1);
+      const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
+      const { routines, isLoading } = useRoutines(12, page);
+
+      const filteredRoutines = routines?.data.filter(routine => {
+        if (!selectedLevel) return true;
+        return routine.routine.workout_summary.TrainingLevel === selectedLevel;
+      });
+
+      return (
+        <div>
+          <div className="filters">
+            <button onClick={() => setSelectedLevel(null)}>
+              All Levels
+            </button>
+            <button onClick={() => setSelectedLevel('Beginner')}>
+              Beginner
+            </button>
+            <button onClick={() => setSelectedLevel('Intermediate')}>
+              Intermediate
+            </button>
+            <button onClick={() => setSelectedLevel('Advanced')}>
+              Advanced
+            </button>
+          </div>
+
+          <div className="routines">
+            {filteredRoutines?.map((routine) => (
+              <RoutineCard key={routine.id} routine={routine} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    ```
+  </Tab>
+
+  <Tab title="Routine Details">
+    ```tsx
+    import { useRoutines } from '@/hooks/useRoutines';
+
+    function RoutineDetails() {
+      const { routines, isLoading } = useRoutines(20, 1);
+
+      if (isLoading) return <LoadingSpinner />;
+
+      return (
+        <div>
+          {routines?.data.map((routine) => (
+            <div key={routine.id} className="routine-detail">
+              <h2>{routine.routine.routine_title}</h2>
+              <p>{routine.routine.routine_description}</p>
+
+              <div className="summary">
+                <div>
+                  <strong>Goal:</strong>
+                  {routine.routine.workout_summary.MainGoal}
+                </div>
+                <div>
+                  <strong>Type:</strong>
+                  {routine.routine.workout_summary.WorkoutType}
+                </div>
+                <div>
+                  <strong>Level:</strong>
+                  {routine.routine.workout_summary.TrainingLevel}
+                </div>
+                <div>
+                  <strong>Duration:</strong>
+                  {routine.routine.workout_summary.ProgramDuration}
+                </div>
+                <div>
+                  <strong>Frequency:</strong>
+                  {routine.routine.workout_summary.DaysPerWeek} days/week
+                </div>
+                <div>
+                  <strong>Time:</strong>
+                  {routine.routine.workout_summary.TimePerWorkout}
+                </div>
+                <div>
+                  <strong>Equipment:</strong>
+                  {routine.routine.workout_summary.EquipmentRequired}
+                </div>
+              </div>
+
+              <div className="workout-plan">
+                <h3>Workout Plan</h3>
+                {routine.routine.workout_plan.map((day, idx) => (
+                  <div key={idx}>
+                    <h4>{day.heading}</h4>
+                    <p>{day.day_plan}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## React Query Features
+
+### Automatic Caching
+
+The hook uses React Query's caching mechanism with a query key based on both `limit` and `page` parameters:
+
+```typescript
+queryKey: ["routines", limit, page]
+```
+
+Each unique combination of parameters is cached separately, preventing duplicate API calls when navigating between pages.
+
+### Placeholder Data
+
+The hook uses `keepPreviousData` for smooth pagination transitions:
+
+```typescript
+placeholderData: keepPreviousData
+```
+
+<Note>
+  Previous page data remains visible while new data loads, preventing layout shifts and improving perceived performance.
+</Note>
+
+### Cache Invalidation
+
+You can manually invalidate the cache when needed:
+
+```tsx
+import { useQueryClient } from '@tanstack/react-query';
+import { useRoutines } from '@/hooks/useRoutines';
+
+function RoutineManager() {
+  const queryClient = useQueryClient();
+  const { routines } = useRoutines(10, 1);
+
+  const handleRoutineUpdate = async () => {
+    // After updating a routine
+    await updateRoutine(/* ... */);
+    
+    // Invalidate all routine queries
+    queryClient.invalidateQueries({ queryKey: ['routines'] });
+  };
+
+  // ...
+}
+```
+
+## Best Practices
+
+<Tip>
+  **Specify appropriate page sizes**: For routine cards with images and detailed information, consider smaller page sizes (6-12 items) to maintain good performance.
+</Tip>
+
+<Tip>
+  **Display workout summaries**: Use the `workout_summary` data to help users quickly filter and find routines matching their goals and fitness level.
+</Tip>
+
+<Tip>
+  **Handle empty states**: Check if `routines?.data` is empty and display an appropriate message when no routines match the current page or filters.
+</Tip>
+
+<Tip>
+  **Optimize images**: The `routine_imageUrl` should be lazy-loaded and properly sized for better performance, especially with larger page sizes.
+</Tip>
+
+<Note>
+  Both `limit` and `page` parameters are required. Omitting them will cause TypeScript errors. If you need default behavior, wrap the hook in a custom hook with defaults.
+</Note>
+
+## Common Patterns
+
+### Category Filtering
+
+```tsx
+function CategoryFilter() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { routines } = useRoutines(20, 1);
+
+  const filtered = routines?.data.filter(routine => {
+    if (!selectedCategory) return true;
+    return routine.category.includes(selectedCategory);
+  });
+
+  // Get unique categories
+  const categories = Array.from(
+    new Set(routines?.data.flatMap(r => r.category) || [])
+  );
+
+  return (
+    <div>
+      <select onChange={(e) => setSelectedCategory(e.target.value || null)}>
+        <option value="">All Categories</option>
+        {categories.map(cat => (
+          <option key={cat} value={cat}>{cat}</option>
+        ))}
+      </select>
+      {/* Display filtered routines */}
+    </div>
+  );
+}
+```
+
+### Progressive Loading
+
+```tsx
+function ProgressiveRoutines() {
+  const [page, setPage] = useState(1);
+  const [allRoutines, setAllRoutines] = useState<IRoutine[]>([]);
+  const { routines, isLoading } = useRoutines(6, page);
+
+  useEffect(() => {
+    if (routines?.data) {
+      setAllRoutines(prev => {
+        const newRoutines = routines.data.filter(
+          r => !prev.some(p => p.id === r.id)
+        );
+        return [...prev, ...newRoutines];
+      });
+    }
+  }, [routines]);
+
+  const hasMore = page < (routines?.totalPages || 0);
+
+  return (
+    <div>
+      {allRoutines.map(routine => (
+        <RoutineCard key={routine.id} routine={routine} />
+      ))}
+      {hasMore && (
+        <button onClick={() => setPage(p => p + 1)} disabled={isLoading}>
+          {isLoading ? 'Loading...' : 'Load More Routines'}
+        </button>
+      )}
+    </div>
+  );
+}
+```
+
+### Search and Filter
+
+```tsx
+function RoutineSearch() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const { routines } = useRoutines(50, 1); // Load more for client-side search
+
+  const searchResults = routines?.data.filter(routine => {
+    const title = routine.routine.routine_title.toLowerCase();
+    const description = routine.routine.routine_description.toLowerCase();
+    const term = searchTerm.toLowerCase();
+    return title.includes(term) || description.includes(term);
+  });
+
+  return (
+    <div>
+      <input
+        type="search"
+        placeholder="Search routines..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <p>{searchResults?.length || 0} routines found</p>
+      {searchResults?.map(routine => (
+        <RoutineCard key={routine.id} routine={routine} />
+      ))}
+    </div>
+  );
+}
+```

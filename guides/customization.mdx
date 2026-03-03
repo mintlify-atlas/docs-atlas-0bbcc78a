@@ -1,0 +1,306 @@
+---
+title: Customization
+description: Personalize your BodyWorks experience with theme preferences and responsive design features
+---
+
+BodyWorks is designed to provide a personalized, comfortable browsing experience across all devices. This guide covers how to customize the interface to match your preferences and how the platform adapts to different screen sizes.
+
+## Theme Switching (Dark/Light Mode)
+
+BodyWorks features a beautiful theme system with both light and dark modes, allowing you to choose the interface that's most comfortable for your eyes and environment.
+
+### Understanding the Themes
+
+**Light Mode:**
+- Bright, clean interface with amber and orange accent colors
+- White and light gray backgrounds
+- Dark text for optimal readability
+- Amber shadows and highlights (amber-900, amber-800 tones)
+- Ideal for well-lit environments and daytime use
+
+**Dark Mode:**
+- Sleek, modern dark interface with pink and violet accents
+- Black and dark gray backgrounds
+- Light text for comfortable reading in low light
+- Pink and violet shadows and highlights (pink-500, violet-500 tones)
+- Reduces eye strain in dark environments
+- Saves battery on OLED screens
+
+### How to Toggle Themes
+
+<Steps>
+  <Step title="Locate the theme toggle">
+    In the top-right corner of the navigation bar, you'll find a circular button with a sun/moon icon.
+
+    - **Sun icon**: Appears when dark mode is active
+    - **Moon icon**: Appears when light mode is active
+
+    The button has a rounded, outlined design that matches the overall interface aesthetic.
+  </Step>
+
+  <Step title="Click to switch themes">
+    Simply click the theme toggle button to switch between light and dark modes.
+
+    The transition is smooth with animated icon changes:
+    - In light mode, the sun icon is visible
+    - In dark mode, the moon icon appears with a rotation animation
+  </Step>
+
+  <Step title="Theme persists">
+    Your theme choice is automatically saved and will persist across:
+    - Page navigation
+    - Browser sessions
+    - Return visits to the site
+
+    The theme is stored locally in your browser using `next-themes`, so you won't need to switch it again.
+  </Step>
+</Steps>
+
+<Tip>
+  Try switching themes in different lighting conditions to find what's most comfortable for your eyes. Many users prefer dark mode for evening workouts and light mode during the day.
+</Tip>
+
+### Theme-Aware Components
+
+The entire BodyWorks interface adapts to your chosen theme:
+
+**Navigation:**
+- Logo gradient changes from amber (light) to pink/violet (dark)
+- Navigation items use theme-appropriate colors
+- Hover states adjust to the active theme
+
+**Exercise and Routine Cards:**
+- Card backgrounds: light gray in light mode, black in dark mode
+- Border colors adapt: black/20% opacity (light) to white/20% opacity (dark)
+- Shadows change: amber-900 (light) to pink-500 (dark)
+- Hover effects: emerald shadows in dark mode for extra visual interest
+
+**Content Pages:**
+- Text colors: amber-800/900 (light) to gray-200/300 (dark)
+- Borders: amber-900 (light) to gray-700 (dark)
+- Accent colors: amber gradients (light) to pink/violet gradients (dark)
+- Heading underlines: amber-900 (light) to pink-400 (dark)
+
+**Interactive Elements:**
+- Links use gradient text clipping for beautiful color transitions
+- Buttons adapt their colors and hover states
+- Input fields maintain readability in both themes
+
+<Note>
+  The theme system uses CSS variables and Tailwind's `dark:` prefix to ensure every component looks great in both light and dark modes.
+</Note>
+
+## Responsive Design Features
+
+BodyWorks is built with a mobile-first, responsive design that adapts seamlessly to any screen size.
+
+### Breakpoints
+
+The platform uses the following responsive breakpoints:
+
+- **xs**: Extra small devices (up to 540px) - Small phones
+- **sm**: Small devices (640px+) - Phones in landscape, larger phones
+- **md**: Medium devices (768px+) - Tablets
+- **lg**: Large devices (1024px+) - Laptops, small desktops
+- **xl**: Extra large devices (1280px+) - Large desktops
+- **2xl**: 2X large devices (1536px+) - Wide monitors
+
+### Navigation Adaptations
+
+<Steps>
+  <Step title="Desktop Navigation (1024px+)">
+    On larger screens, you get the full navigation experience:
+    - Full logo with "Works" text
+    - Dropdown menus for Exercises and Routines
+    - Hoverable menu items showing all options
+    - Theme toggle in top-right corner
+  </Step>
+
+  <Step title="Tablet & Mobile Navigation (below 1024px)">
+    On smaller screens, the navigation simplifies:
+    - Logo icon only (no "Works" text on screens below 540px)
+    - Condensed navigation menu
+    - Theme toggle remains accessible
+    - Touch-optimized spacing
+  </Step>
+</Steps>
+
+### Content Grid Adaptations
+
+Exercise and routine listings automatically adjust:
+
+**Exercise Cards:**
+- **Mobile (default)**: 1 column, full-width cards
+- **Tablet (lg: 1024px+)**: 2 columns, side-by-side layout
+- **Desktop (2xl: 1536px+)**: 3 columns, optimal browsing
+
+**Target Muscles Grid:**
+- **Mobile (default)**: 1 column
+- **Tablet (md: 768px+)**: 2 columns
+- **Desktop (lg: 1024px+)**: 3 columns
+
+**Routine Cards:**
+- Same responsive behavior as exercise cards
+- Cards maintain their 3D effect on all screen sizes
+- Card max-width adjusts: 62 units (xs) → 80 units (sm) → 68 units (lg)
+
+<Tip>
+  On mobile devices, scroll vertically through exercise cards. On larger screens, take advantage of the multi-column grid to compare multiple options at once.
+</Tip>
+
+### Exercise Detail Page Adaptations
+
+<Steps>
+  <Step title="Desktop Layout (lg: 1024px+)">
+    The exercise detail page uses a 2-column grid:
+    - **Left column**: Exercise information (title, target muscle, body part, equipment)
+    - **Right column**: Exercise GIF animation
+    - Reference images and videos in horizontal carousels
+  </Step>
+
+  <Step title="Mobile Layout (below 1024px)">
+    Content stacks vertically for easy reading:
+    - Exercise title and information on top
+    - GIF animation below
+    - Reference images in vertical carousel (swipe up/down)
+    - Reference videos in vertical carousel
+    - Full-width content for optimal mobile viewing
+  </Step>
+</Steps>
+
+### Routine Detail Page Adaptations
+
+**Desktop (lg: 1024px+):**
+- Header grid: 2 columns (info left, image right)
+- Category tags display horizontally
+- Workout summary table with full columns
+- Workout plan in organized sections
+
+**Mobile:**
+- All content stacks vertically
+- Header border styling adapts
+- Category tags overflow horizontally with scroll
+- Tables become horizontally scrollable if needed
+- Reduced padding and margins for mobile optimization
+
+### Text Size Adaptations
+
+Text sizes scale responsively for optimal readability:
+
+**Headings:**
+- `xs:text-3xl` → `md:text-4xl` → `xl:text-5xl`
+- Larger screens get larger, more impactful headings
+
+**Body Text:**
+- `xs:text-xs` → `md:text-base`
+- Comfortable reading size on all devices
+
+**Buttons and Interactive Elements:**
+- Touch-friendly sizing on mobile (minimum 44x44px)
+- Appropriately sized for mouse interaction on desktop
+
+<Note>
+  The responsive text sizing ensures that content is readable without zooming on any device, from the smallest phone to the largest desktop monitor.
+</Note>
+
+### Image and Media Adaptations
+
+**Exercise GIFs:**
+- Mobile: `h-80` (20rem/320px height)
+- Desktop: `sm:h-96` (24rem/384px height)
+- Width adapts: `w-fit` (mobile) → `md:w-full` (desktop)
+- Always centered with `mx-auto`
+
+**Carousels:**
+- **Desktop**: Horizontal orientation, swipe left/right
+- **Mobile**: Vertical orientation, swipe up/down
+- Navigation arrows: Hidden on extra small screens, visible on sm+
+- Item sizing: Full width on mobile, 1/2 or 1/3 width on larger screens
+
+**Routine Images:**
+- Responsive height: `h-60` (15rem/240px)
+- Full width within card container
+- Object-fit: cover (fills space without distortion)
+- Rounded corners: `rounded-xl`
+
+### Spacing and Padding Adaptations
+
+**Container Spacing:**
+- Mobile: Compact padding (`xs:px-4`)
+- Tablet: Medium padding (`sm:px-8`)
+- Desktop: Standard container padding
+
+**Vertical Spacing:**
+- Mobile: Reduced gaps (`space-y-20`)
+- Desktop: Generous gaps (`sm:space-y-40`)
+- Section margins adapt: `xs:mb-16` → `md:mb-20`
+
+<Tip>
+  On tablets, try rotating between portrait and landscape orientations to see how the layout adapts in real-time.
+</Tip>
+
+## Accessibility Features
+
+BodyWorks includes several accessibility considerations:
+
+**Keyboard Navigation:**
+- All interactive elements are keyboard accessible
+- Focus states are visible
+- Logical tab order throughout the interface
+
+**Color Contrast:**
+- Both light and dark themes maintain WCAG AA contrast ratios
+- Text remains readable against all backgrounds
+- Interactive elements have clear visual states
+
+**Screen Reader Support:**
+- Semantic HTML structure
+- Alt text for images
+- Proper heading hierarchy
+- ARIA labels where needed
+
+**Focus Management:**
+- Clear focus indicators on interactive elements
+- Focus doesn't get trapped in modals or dropdowns
+- Skip-to-content functionality
+
+<Note>
+  If you encounter any accessibility issues, the BodyWorks team is committed to improving the experience for all users.
+</Note>
+
+## Performance Optimizations
+
+The responsive design includes performance features:
+
+**Image Optimization:**
+- Next.js Image component for automatic optimization
+- Responsive image loading based on screen size
+- Lazy loading for images below the fold
+- Quality set to 100 for crisp GIFs and photos
+
+**Component Loading:**
+- Loading skeletons during data fetch
+- Suspense boundaries for better perceived performance
+- Smooth transitions between states
+
+**CSS Optimizations:**
+- Utility-first CSS with Tailwind (smaller bundle size)
+- Purged unused styles in production
+- CSS variables for theme switching (no reload needed)
+
+## Tips for the Best Experience
+
+1. **Choose your preferred theme**: Set it once and it'll persist across all your visits
+2. **Use the right device for your needs**:
+   - Desktop: Best for detailed research and comparing multiple exercises/routines
+   - Tablet: Great for following along during workouts
+   - Mobile: Perfect for quick lookups at the gym
+3. **Enable smooth scrolling**: Most browsers support smooth scrolling for better navigation
+4. **Keep your browser updated**: Modern browsers provide the best performance and visual effects
+5. **Try both orientations on tablets**: Some users prefer landscape for the multi-column layouts
+
+## Next Steps
+
+- Learn how to [Find Exercises](/guides/finding-exercises) using the responsive interface
+- Discover [Workout Routines](/guides/workout-routines) and how they display on different devices
+- Start using BodyWorks with your preferred theme and device!

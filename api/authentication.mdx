@@ -1,0 +1,278 @@
+---
+title: 'Authentication'
+description: 'Learn how to configure and access the BodyWorks API - no authentication required'
+---
+
+## No Authentication Required
+
+The BodyWorks API is a **free, public API** that does not require any authentication, API keys, or tokens. You can start making requests immediately after configuring the base URL.
+
+<Note>
+  This is a community-driven fitness API. No registration, API keys, or authentication headers are needed.
+</Note>
+
+## Quick Start
+
+Get started with the BodyWorks API in three simple steps:
+
+<Steps>
+  <Step title="Set Environment Variable">
+    Configure the API base URL in your environment:
+    
+    ```bash
+    NEXT_PUBLIC_API_BASE_URL=https://your-api-url.com/api/
+    ```
+  </Step>
+  
+  <Step title="Install Dependencies">
+    The API client uses axios for HTTP requests:
+    
+    ```bash
+    npm install axios
+    # or
+    bun install axios
+    ```
+  </Step>
+  
+  <Step title="Make Your First Request">
+    Import and use the API caller:
+    
+    ```typescript
+    import { apiCaller } from "@/lib/apiCaller";
+    
+    const response = await apiCaller.get("/exercises");
+    ```
+  </Step>
+</Steps>
+
+## Environment Configuration
+
+### Setting Up the Base URL
+
+The API base URL is configured using the `NEXT_PUBLIC_API_BASE_URL` environment variable:
+
+<ParamField path="NEXT_PUBLIC_API_BASE_URL" type="string" required>
+  The base URL for the BodyWorks API server
+  
+  **Default:** `http://localhost:3000/api/`
+  
+  **Example:** `https://api.bodyworks.com/api/`
+</ParamField>
+
+### Configuration Example
+
+Create a `.env.local` file in your project root:
+
+```bash .env.local
+# BodyWorks API Configuration
+NEXT_PUBLIC_API_BASE_URL=https://your-bodyworks-api.com/api/
+```
+
+<Warning>
+  If you're using Next.js, environment variables prefixed with `NEXT_PUBLIC_` are exposed to the browser. This is safe for public APIs but avoid storing secrets with this prefix.
+</Warning>
+
+## API Client Setup
+
+The BodyWorks API client is configured in `lib/apiCaller.ts`:
+
+```typescript lib/apiCaller.ts
+import axios, { AxiosInstance } from "axios";
+
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api/";
+
+interface ApiConfig {
+  baseURL: string;
+}
+
+export const createApi = ({ baseURL }: ApiConfig): AxiosInstance => {
+  if (!baseURL) {
+    throw new Error("API baseURL is required");
+  }
+  return axios.create({
+    baseURL,
+  });
+};
+
+export const apiCaller: AxiosInstance = createApi({ baseURL: API_BASE_URL });
+```
+
+### How It Works
+
+1. **Base URL Resolution**: Reads from `NEXT_PUBLIC_API_BASE_URL` or falls back to `http://localhost:3000/api/`
+2. **Validation**: Ensures the base URL is provided before creating the client
+3. **Axios Instance**: Creates a configured axios instance for all API calls
+
+## Making Requests
+
+Since no authentication is required, you can make requests directly using the API caller:
+
+### GET Request
+
+```typescript
+import { apiCaller } from "@/lib/apiCaller";
+
+// Fetch exercises with pagination
+const getExercises = async (limit: number, page: number) => {
+  const response = await apiCaller.get("/exercises", {
+    params: {
+      limit,
+      page,
+    },
+  });
+  return response.data;
+};
+```
+
+### Fetching Body Parts
+
+```typescript
+import { apiCaller } from "@/lib/apiCaller";
+
+const getBodyParts = async (limit?: number) => {
+  const response = await apiCaller.get("bodyParts", {
+    params: {
+      limit,
+    },
+  });
+  return response.data;
+};
+```
+
+### Fetching Routines
+
+```typescript
+import { apiCaller } from "@/lib/apiCaller";
+
+const getRoutines = async (limit: number, page: number) => {
+  const response = await apiCaller.get("routines", {
+    params: {
+      limit,
+      page,
+    },
+  });
+  return response.data;
+};
+```
+
+## Request Headers
+
+No special headers are required for BodyWorks API requests. The axios client handles standard headers automatically:
+
+- `Content-Type: application/json` (for requests with a body)
+- `Accept: application/json`
+
+## Error Handling
+
+### Configuration Errors
+
+If the base URL is not configured properly, the API client will throw an error:
+
+```typescript
+if (!baseURL) {
+  throw new Error("API baseURL is required");
+}
+```
+
+### Request Errors
+
+Handle API errors using try-catch blocks:
+
+```typescript
+import { apiCaller } from "@/lib/apiCaller";
+import { AxiosError } from "axios";
+
+try {
+  const response = await apiCaller.get("/exercises");
+  return response.data;
+} catch (error) {
+  if (error instanceof AxiosError) {
+    console.error("API Error:", error.response?.status, error.message);
+  }
+  throw error;
+}
+```
+
+## Integration with React Query
+
+The BodyWorks application uses React Query for data fetching. Here's a complete example:
+
+```typescript hooks/useExercises.tsx
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { apiCaller } from "@/lib/apiCaller";
+
+const getExercises = async (
+  limit: number,
+  page: number
+): Promise<IExerciseData> => {
+  const exercises = await apiCaller.get<IExerciseData>("/exercises", {
+    params: {
+      limit,
+      page,
+    },
+  });
+  return exercises.data;
+};
+
+const useExercises = (limit: number = 9, page: number = 1) => {
+  const {
+    isLoading,
+    data: exercises,
+    error,
+    refetch,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["exercises", limit, page],
+    queryFn: () => getExercises(limit, page),
+    placeholderData: keepPreviousData,
+  });
+  return { isLoading, exercises, error, refetch, isRefetching };
+};
+
+export default useExercises;
+```
+
+## TypeScript Support
+
+The API client is fully typed with TypeScript. Define interfaces for your API responses:
+
+```typescript
+interface IExerciseData {
+  data: Exercise[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    limit: number;
+  };
+}
+
+// Use with type safety
+const response = await apiCaller.get<IExerciseData>("/exercises");
+```
+
+## API Source
+
+The BodyWorks API is open source and available on GitHub:
+
+<Card title="Body Works API" icon="github" href="https://github.com/Akshat-Jaiswal-8/body-works-api">
+  Access the API source code, documentation, and deployment instructions
+</Card>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Introduction" icon="book" href="/api/introduction">
+    Learn about available endpoints and response formats
+  </Card>
+  <Card title="Exercises" icon="dumbbell" href="/api/exercises">
+    Start fetching exercise data
+  </Card>
+  <Card title="Routines" icon="calendar" href="/api/routines">
+    Explore workout routines
+  </Card>
+  <Card title="Error Handling" icon="triangle-exclamation" href="/api/errors">
+    Handle API errors gracefully
+  </Card>
+</CardGroup>
