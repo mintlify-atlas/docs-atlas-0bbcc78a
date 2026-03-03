@@ -1,0 +1,119 @@
+{
+  "projectType": "saas",
+  "projectName": "BodyWorks",
+  "projectDescription": "A comprehensive fitness platform with 1300+ exercises, 600+ workout routines, and advanced filtering by body parts, target muscles, and equipment.",
+  "theme": "palm",
+  "primaryColor": "#d97706",
+  "lightColor": "#fbbf24",
+  "darkColor": "#b45309",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/exercises",
+              "features/routines",
+              "features/filtering",
+              "features/search"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/finding-exercises",
+              "guides/workout-routines",
+              "guides/customization"
+            ]
+          },
+          {
+            "group": "Components",
+            "pages": [
+              "components/overview",
+              "components/ui-library",
+              "components/hooks"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api/introduction",
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api/exercises",
+              "api/routines",
+              "api/body-parts",
+              "api/equipment",
+              "api/target-muscles"
+            ]
+          },
+          {
+            "group": "React Hooks",
+            "pages": [
+              "api/hooks/use-exercises",
+              "api/hooks/use-routines",
+              "api/hooks/use-body-parts",
+              "api/hooks/use-equipment",
+              "api/hooks/use-target-muscles"
+            ]
+          },
+          {
+            "group": "TypeScript Types",
+            "pages": [
+              "api/types/exercise",
+              "api/types/routine",
+              "api/types/filters"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "1300+ exercise database with detailed instructions and media",
+    "600+ pre-built workout routines for all fitness levels",
+    "Advanced filtering by 30+ equipment types, 20+ target muscles, and 10+ body parts",
+    "React Query powered data fetching with optimistic updates",
+    "Responsive design with Shadcn UI and Aceternity UI components",
+    "TypeScript support with comprehensive type definitions"
+  ],
+  "publicApiSurface": [
+    "useExercises(limit, page)",
+    "useExercise(exerciseId)",
+    "useRoutines(limit, page)",
+    "useRoutine(routineId)",
+    "useBodyParts()",
+    "useBodyPart(bodyPart)",
+    "useEquipments()",
+    "useEquipment(equipment)",
+    "useTargetMuscles()",
+    "useTargetMuscle(targetMuscle)",
+    "useRoutinesCategory()",
+    "GET /exercises",
+    "GET /exercises/:id",
+    "GET /routines",
+    "GET /routines/:id",
+    "GET /body-parts",
+    "GET /equipment",
+    "GET /target-muscles"
+  ]
+}
